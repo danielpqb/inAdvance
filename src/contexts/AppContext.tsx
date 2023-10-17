@@ -1,4 +1,5 @@
-import { useLocalSearchParams, usePathname, useSegments } from "expo-router";
+import { TLoan } from "@/types/Loan";
+import { useSegments } from "expo-router";
 import {
   FC,
   ReactNode,
@@ -21,11 +22,19 @@ const navigation = {
   mode: "default" as "default" | "delete",
 };
 
+type TSubHeader = {
+  showSubHeader?: boolean;
+  subHeaderName?: string;
+  subHeaderDescription?: string;
+};
+
 type TContext = {
-  headerStates: typeof header;
+  headerStates: typeof header & TSubHeader;
   footerStates: typeof footer;
   navigationStates: typeof navigation;
   changeNavigationMode: (mode: typeof navigation.mode) => void;
+  selectedLoan: TLoan;
+  setSelectedLoan: React.Dispatch<React.SetStateAction<TLoan>>;
 };
 const Context = createContext<TContext>({} as TContext);
 
@@ -33,9 +42,12 @@ type TProps = {
   children: ReactNode;
 };
 const AppContext: FC<TProps> = ({ children }) => {
-  const [headerStates, setHeaderStates] = useState(header);
+  const [headerStates, setHeaderStates] = useState(
+    header as TContext["headerStates"]
+  );
   const [footerStates, setFooterStates] = useState(footer);
   const [navigationStates, setNavigationStates] = useState(navigation);
+  const [selectedLoan, setSelectedLoan] = useState({} as TLoan);
 
   const segments = useSegments();
   useEffect(() => {
@@ -56,6 +68,7 @@ const AppContext: FC<TProps> = ({ children }) => {
           showAddButton: true,
           showBackButton: false,
           showDeleteButton: false,
+          showSubHeader: false,
         }));
         setFooterStates({ showFooter: true });
         break;
@@ -65,6 +78,7 @@ const AppContext: FC<TProps> = ({ children }) => {
           showAddButton: false,
           showBackButton: true,
           showDeleteButton: false,
+          showSubHeader: false,
         }));
         setFooterStates({ showFooter: false });
         break;
@@ -74,6 +88,7 @@ const AppContext: FC<TProps> = ({ children }) => {
           showAddButton: true,
           showBackButton: false,
           showDeleteButton: false,
+          showSubHeader: false,
         }));
         setFooterStates({ showFooter: true });
         break;
@@ -83,6 +98,7 @@ const AppContext: FC<TProps> = ({ children }) => {
           showAddButton: false,
           showBackButton: true,
           showDeleteButton: false,
+          showSubHeader: false,
         }));
         setFooterStates({ showFooter: false });
         break;
@@ -92,6 +108,9 @@ const AppContext: FC<TProps> = ({ children }) => {
           showAddButton: false,
           showBackButton: true,
           showDeleteButton: false,
+          showSubHeader: true,
+          subHeaderName: selectedLoan.name,
+          subHeaderDescription: selectedLoan.description,
         }));
         setFooterStates({ showFooter: false });
         break;
@@ -116,6 +135,8 @@ const AppContext: FC<TProps> = ({ children }) => {
         footerStates,
         navigationStates,
         changeNavigationMode,
+        selectedLoan,
+        setSelectedLoan,
       }}
     >
       {children}

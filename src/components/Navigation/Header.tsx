@@ -26,6 +26,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: gSC("neutral900"),
   },
+  subHeader: {
+    padding: 15,
+    paddingTop: 0,
+    backgroundColor: gSC("neutral900"),
+    gap: 5,
+  },
+  subHeaderName: {
+    color: gSC("emerald600"),
+    textAlign: "center",
+  },
+  subHeaderDescription: {
+    color: gSC("zinc100"),
+    textAlign: "center",
+  },
   text: {
     fontSize: 18,
     fontWeight: "bold",
@@ -127,6 +141,16 @@ const Header: React.FC<HeaderProps> = ({
           </Button>
         ) : null}
       </View>
+      {headerStates.showSubHeader ? (
+        <View style={{ ...styles.subHeader }}>
+          <Text style={{ ...styles.subHeaderName }}>
+            {headerStates.subHeaderName}
+          </Text>
+          <Text style={{ ...styles.subHeaderDescription }}>
+            {headerStates.subHeaderDescription}
+          </Text>
+        </View>
+      ) : null}
     </>
   );
 };

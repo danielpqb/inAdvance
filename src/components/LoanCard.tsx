@@ -54,7 +54,7 @@ type TLoanCardProps = {
   };
 };
 const LoanCard: FC<TLoanCardProps> = ({ data }) => {
-  const { changeNavigationMode } = useAppContext();
+  const { changeNavigationMode, setSelectedLoan } = useAppContext();
 
   return (
     <Button
@@ -63,6 +63,7 @@ const LoanCard: FC<TLoanCardProps> = ({ data }) => {
         changeNavigationMode("delete");
       }}
       onPress={() => {
+        setSelectedLoan(data);
         router.push(`/loans/${data.id}`);
       }}
     >

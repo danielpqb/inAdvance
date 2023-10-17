@@ -47,6 +47,8 @@ type TLoanCardProps = {
     name: string;
     total: number;
     description: string;
+    maxInstallments: number;
+    paidInstallments: number;
   };
 };
 const LoanCard: FC<TLoanCardProps> = ({ data }) => {
@@ -75,6 +77,7 @@ const LoanCard: FC<TLoanCardProps> = ({ data }) => {
           <View style={{ ...styles.bottomInfoView }}>
             <Text style={{ ...styles.bottomInfoLabel }}>Restante a Pagar</Text>
             <Text style={{ ...styles.bottomInfoText }}>
+              <Text style={{ fontSize: 16 }}>R$ </Text>
               {monetaryNumberToString(123456)}
             </Text>
           </View>
@@ -83,7 +86,14 @@ const LoanCard: FC<TLoanCardProps> = ({ data }) => {
               Parcelas Pagas
             </Text>
             <Text style={{ ...styles.bottomInfoText, textAlign: "right" }}>
-              10/12
+              {data.paidInstallments}
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "600",
+                  color: gSC("zinc100"),
+                }}
+              >{` / ${data.maxInstallments}`}</Text>
             </Text>
           </View>
         </View>

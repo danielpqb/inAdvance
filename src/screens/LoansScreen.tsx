@@ -24,42 +24,56 @@ const loansData = [
     total: 156000,
     description:
       "Sapato preto de muitas funcionalidades que deve ser usado diariamente para conforto dos pés",
+    maxInstallments: 12,
+    paidInstallments: 10,
   },
   {
     name: "Daniel Pereira Queiroz Barros",
     total: 23410,
     description:
       "Sapato preto de muitas funcionalidades que deve ser usado diariamente para conforto dos pés",
+    maxInstallments: 12,
+    paidInstallments: 10,
   },
   {
     name: "Vanessa Gomes Queiroz Barros",
     total: 52000,
     description:
       "Sapato preto de muitas funcionalidades que deve ser usado diariamente para conforto dos pés",
+    maxInstallments: 12,
+    paidInstallments: 10,
   },
   {
     name: "Julia Pereira Queiroz Barros",
     total: 2159070,
     description:
       "Sapato preto de muitas funcionalidades que deve ser usado diariamente para conforto dos pés",
+    maxInstallments: 12,
+    paidInstallments: 10,
   },
   {
     name: "Leonardo Queiroz Barros",
     total: 716000,
     description:
       "Sapato preto de muitas funcionalidades que deve ser usado diariamente para conforto dos pés",
+    maxInstallments: 12,
+    paidInstallments: 10,
   },
   {
     name: "Marília Gomes",
     total: 1061030,
     description:
       "Sapato preto de muitas funcionalidades que deve ser usado diariamente para conforto dos pés",
+    maxInstallments: 12,
+    paidInstallments: 10,
   },
   {
     name: "Juliane Carneiro",
     total: 122002,
     description:
       "Sapato preto de muitas funcionalidades que deve ser usado diariamente para conforto dos pés",
+    maxInstallments: 12,
+    paidInstallments: 10,
   },
 ];
 

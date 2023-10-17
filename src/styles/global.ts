@@ -2,6 +2,8 @@ import { StyleSheet } from "react-native";
 import colors from "../../gsc.config.json";
 import Color from "@/utils/color-converter";
 
+export type TGlobalColors = keyof typeof gColors;
+
 const gColors = colors;
 /**
  * @param opacity number from 0 to 1

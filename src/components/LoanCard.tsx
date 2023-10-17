@@ -4,6 +4,7 @@ import { StyleSheet, View, Text } from "react-native";
 import Button from "./Button";
 import { useAppContext } from "@/contexts/AppContext";
 import { monetaryNumberToString } from "@/utils/monetary-value-converter";
+import { router } from "expo-router";
 
 const styles = StyleSheet.create({
   view: {
@@ -44,6 +45,7 @@ const styles = StyleSheet.create({
 
 type TLoanCardProps = {
   data: {
+    id: number;
     name: string;
     total: number;
     description: string;
@@ -60,8 +62,8 @@ const LoanCard: FC<TLoanCardProps> = ({ data }) => {
       onLongPress={() => {
         changeNavigationMode("delete");
       }}
-      onPress={async () => {
-        console.warn("Navegar para Parcelas desse empréstimo!");
+      onPress={() => {
+        router.push(`/loans/${data.id}`);
       }}
     >
       <View style={{ ...styles.view }}>
@@ -78,7 +80,7 @@ const LoanCard: FC<TLoanCardProps> = ({ data }) => {
             <Text style={{ ...styles.bottomInfoLabel }}>Restante a Pagar</Text>
             <Text style={{ ...styles.bottomInfoText }}>
               <Text style={{ fontSize: 16 }}>R$ </Text>
-              {monetaryNumberToString(123456)}
+              {monetaryNumberToString(data.total)}
             </Text>
           </View>
           <View style={{ ...styles.bottomInfoView }}>

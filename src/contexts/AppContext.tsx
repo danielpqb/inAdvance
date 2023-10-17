@@ -1,4 +1,4 @@
-import { usePathname } from "expo-router";
+import { useLocalSearchParams, usePathname, useSegments } from "expo-router";
 import {
   FC,
   ReactNode,
@@ -37,10 +37,10 @@ const AppContext: FC<TProps> = ({ children }) => {
   const [footerStates, setFooterStates] = useState(footer);
   const [navigationStates, setNavigationStates] = useState(navigation);
 
-  const path = usePathname();
+  const segments = useSegments();
   useEffect(() => {
     configNavigators();
-  }, [path, navigationStates]);
+  }, [segments, navigationStates]);
 
   function changeNavigationMode(mode: typeof navigation.mode) {
     setNavigationStates((old) => {
@@ -49,7 +49,7 @@ const AppContext: FC<TProps> = ({ children }) => {
   }
 
   function configNavigators() {
-    switch (path) {
+    switch (`/${segments.join("/")}`) {
       case "/customers":
         setHeaderStates(() => ({
           title: "Clientes",

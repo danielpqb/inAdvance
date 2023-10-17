@@ -1,3 +1,4 @@
+import { View } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { withLayoutContext } from "expo-router";
 import Header from "./Header";
@@ -11,6 +12,9 @@ const NavigationDrawer: React.FC<NavigationDrawerProps> = () => {
     <>
       <Drawer
         detachInactiveScreens
+        drawerContent={() => (
+          <View style={{ backgroundColor: "transparent" }}></View>
+        )}
         screenOptions={() => ({
           sceneContainerStyle: { backgroundColor: "transparent" },
           header: ({ navigation, route, layout, options }) => (

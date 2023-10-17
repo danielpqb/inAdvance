@@ -4,6 +4,7 @@ import { StyleSheet, View, Text } from "react-native";
 import Button from "./Button";
 import { useAppContext } from "@/contexts/AppContext";
 import { monetaryNumberToString } from "@/utils/monetary-value-converter";
+import { router } from "expo-router";
 
 const styles = StyleSheet.create({
   view: {
@@ -14,7 +15,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     borderColor: gSC("zinc300", 0.2),
-    gap: 15,
+    gap: 10,
     width: "100%",
   },
   name: {
@@ -28,7 +29,7 @@ const styles = StyleSheet.create({
     flex: 0,
   },
   totalLabel: {
-    color: gSC("zinc100"),
+    color: gSC("zinc100", 0.5),
     fontSize: 14,
     fontWeight: "600",
   },
@@ -60,8 +61,8 @@ const CustomerCard: FC<TCustomerCardProps> = ({ data }) => {
       onLongPress={() => {
         changeNavigationMode("delete");
       }}
-      onPress={async () => {
-        console.warn("Navegar para Empréstimos filtrados para esse cliente!");
+      onPress={() => {
+        router.push("/loans")
       }}
     >
       <View style={{ ...styles.view }}>

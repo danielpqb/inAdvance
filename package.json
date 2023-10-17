@@ -12,6 +12,7 @@
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",
     "@react-navigation/drawer": "^6.6.4",
+    "@tanstack/react-query": "^5.0.0",
     "expo": "~49.0.13",
     "expo-asset": "~8.10.1",
     "expo-constants": "~14.4.2",

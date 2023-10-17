@@ -3,6 +3,7 @@ import { monetaryNumberToString } from "@/utils/monetary-value-converter";
 import { FC } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { TInstallment } from "@/types/Installment";
 
 const styles = StyleSheet.create({
   view: {
@@ -45,17 +46,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export type TInstallmentData = {
-  id: number;
-  number: number;
-  installments: number;
-  date: string;
-  status: "Pago" | "Atrasado" | "Aguardando";
-  value: number;
-};
-
 type TInstallmentCardProps = {
-  data: TInstallmentData;
+  data: TInstallment;
 };
 const InstallmentCard: FC<TInstallmentCardProps> = ({ data }) => {
   let statusIconData: { color: TGlobalColors; name: string };

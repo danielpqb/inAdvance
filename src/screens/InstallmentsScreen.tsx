@@ -2,10 +2,9 @@ import { StyleSheet, View } from "react-native";
 import { FC } from "react";
 import { gSC, gStyles } from "@/styles/global";
 import { useLocalSearchParams } from "expo-router";
-import InstallmentCard, {
-  TInstallmentData,
-} from "@/components/InstallmentCard";
 import ScrollContainer from "@/components/ScrollContainer";
+import { TInstallment } from "@/types/Installment";
+import InstallmentCard from "@/components/InstallmentCard";
 
 const styles = StyleSheet.create({
   view: {
@@ -25,7 +24,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const segmentsData: TInstallmentData[] = [
+const segmentsData: TInstallment[] = [
   {
     id: 1,
     number: 1,

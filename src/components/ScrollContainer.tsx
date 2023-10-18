@@ -14,10 +14,8 @@ const styles = StyleSheet.create({
   },
 });
 
-type ScrollContainerContextType = {
-};
-const ScrollContainerContext = createContext<ScrollContainerContextType>({
-});
+type ScrollContainerContextType = {};
+const ScrollContainerContext = createContext<ScrollContainerContextType>({});
 
 type ScrollContainerProps = {
   children: React.ReactNode;
@@ -34,8 +32,8 @@ const ScrollContainer: React.FC<ScrollContainerProps> = ({
   style,
 }) => {
   return (
-    <ScrollContainerContext.Provider value={{  }}>
-      <ScrollView
+    <ScrollContainerContext.Provider value={{}}>
+      <ScrollView        
         refreshControl={
           <RefreshControl
             refreshing={false}

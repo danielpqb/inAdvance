@@ -42,6 +42,7 @@ type TButtonProps = {
   hRef?: string;
   children?: ReactNode;
   style?: ViewStyle & TextStyle;
+  pressedStyle?: ViewStyle;
 };
 
 const Button: FC<TButtonProps> = ({
@@ -50,6 +51,7 @@ const Button: FC<TButtonProps> = ({
   onLongPress = () => {},
   children = "Button",
   style,
+  pressedStyle,
 }) => {
   return (
     <Pressable
@@ -64,8 +66,8 @@ const Button: FC<TButtonProps> = ({
       }}
       style={({ pressed }) => ({
         ...styles.button,
-        ...(style ? { ...style } : {}),
-        ...(pressed ? styles.buttonPressed : {}),
+        ...(style ? style : {}),
+        ...(pressed ? { ...styles.buttonPressed, ...pressedStyle } : {}),
       })}
     >
       {typeof children === "string" ? (

@@ -1,3 +1,4 @@
+import { TCustomer } from "@/types/Customer";
 import { TLoan } from "@/types/Loan";
 import { useSegments } from "expo-router";
 import {
@@ -33,8 +34,12 @@ type TContext = {
   footerStates: typeof footer;
   navigationStates: typeof navigation;
   changeNavigationMode: (mode: typeof navigation.mode) => void;
-  selectedLoan: TLoan;
-  setSelectedLoan: React.Dispatch<React.SetStateAction<TLoan>>;
+  selectedLoan: TLoan | undefined;
+  setSelectedLoan: React.Dispatch<React.SetStateAction<TLoan | undefined>>;
+  selectedCustomer: TCustomer | undefined;
+  setSelectedCustomer: React.Dispatch<
+    React.SetStateAction<TCustomer | undefined>
+  >;
 };
 const Context = createContext<TContext>({} as TContext);
 
@@ -47,7 +52,12 @@ const AppContext: FC<TProps> = ({ children }) => {
   );
   const [footerStates, setFooterStates] = useState(footer);
   const [navigationStates, setNavigationStates] = useState(navigation);
-  const [selectedLoan, setSelectedLoan] = useState({} as TLoan);
+  const [selectedLoan, setSelectedLoan] = useState(
+    undefined as TLoan | undefined
+  );
+  const [selectedCustomer, setSelectedCustomer] = useState(
+    undefined as TCustomer | undefined
+  );
 
   const segments = useSegments();
   useEffect(() => {
@@ -109,8 +119,8 @@ const AppContext: FC<TProps> = ({ children }) => {
           showBackButton: true,
           showDeleteButton: false,
           showSubHeader: true,
-          subHeaderName: selectedLoan.name,
-          subHeaderDescription: selectedLoan.description,
+          subHeaderName: selectedLoan?.customerName,
+          subHeaderDescription: selectedLoan?.description,
         }));
         setFooterStates({ showFooter: false });
         break;
@@ -137,6 +147,8 @@ const AppContext: FC<TProps> = ({ children }) => {
         changeNavigationMode,
         selectedLoan,
         setSelectedLoan,
+        selectedCustomer,
+        setSelectedCustomer,
       }}
     >
       {children}

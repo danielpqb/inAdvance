@@ -1,10 +1,11 @@
 import { gSC, gStyles } from "@/styles/global";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import Button from "./Button";
 import { useAppContext } from "@/contexts/AppContext";
 import { monetaryNumberToString } from "@/utils/monetary-value-converter";
 import { router } from "expo-router";
+import { TCustomer } from "@/types/Customer";
 
 const styles = StyleSheet.create({
   view: {
@@ -47,13 +48,14 @@ const styles = StyleSheet.create({
 });
 
 type TCustomerCardProps = {
-  data: {
-    name: string;
-    total: number;
-  };
+  data: TCustomer;
 };
 const CustomerCard: FC<TCustomerCardProps> = ({ data }) => {
-  const { changeNavigationMode } = useAppContext();
+  const { changeNavigationMode, setSelectedCustomer } = useAppContext();
+
+  useEffect(() => {
+    setSelectedCustomer({} as TCustomer);
+  }, []);
 
   return (
     <Button
@@ -62,7 +64,8 @@ const CustomerCard: FC<TCustomerCardProps> = ({ data }) => {
         changeNavigationMode("delete");
       }}
       onPress={() => {
-        router.push("/loans")
+        setSelectedCustomer(data);
+        router.push("/loans");
       }}
     >
       <View style={{ ...styles.view }}>

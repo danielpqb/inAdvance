@@ -1,6 +1,6 @@
 export type TLoan = {
   id: number;
-  name: string;
+  customerName: string;
   total: number;
   description: string;
   maxInstallments: number;

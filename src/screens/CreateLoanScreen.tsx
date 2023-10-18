@@ -1,8 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
-import { FC } from "react";
+import { StyleSheet, View } from "react-native";
+import { FC, useState } from "react";
 import { gSC, gStyles } from "@/styles/global";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
+import loanDB from "@/services/sqlite/Loans";
+import { router } from "expo-router";
 
 const styles = StyleSheet.create({
   view: {
@@ -24,32 +26,69 @@ const styles = StyleSheet.create({
 
 type TCreateLoanScreenProps = {};
 const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
+  const [inputValues, setInputValues] = useState({
+    customerName: "",
+    description: "",
+    total: "",
+    maxInstallments: "",
+  });
+
   return (
     <View style={{ ...styles.view }}>
       <Input
         label="Cliente"
         inputStyle={{ ...styles.input }}
-        inputProps={{ placeholder: "Digite para pesquisar..." }}
+        inputProps={{
+          placeholder: "Digite para pesquisar...",
+          value: inputValues.customerName,
+          onChangeText: (text) => {
+            setInputValues((old) => ({ ...old, customerName: text }));
+          },
+        }}
       />
       <Input
         label="Descrição"
         inputStyle={{ ...styles.input }}
+        inputProps={{
+          value: inputValues.description,
+          onChangeText: (text) => {
+            setInputValues((old) => ({ ...old, description: text }));
+          },
+        }}
       />
       <Input
         label="Valor Total"
         inputStyle={{ ...styles.input }}
-        inputProps={{ keyboardType: "number-pad" }}
+        inputProps={{
+          keyboardType: "number-pad",
+          value: inputValues.total,
+          onChangeText: (text) => {
+            setInputValues((old) => ({ ...old, total: text }));
+          },
+        }}
       />
       <Input
         label="Número de Parcelas"
         inputStyle={{ ...styles.input }}
-        inputProps={{ keyboardType: "number-pad" }}
+        inputProps={{
+          keyboardType: "number-pad",
+          value: inputValues.maxInstallments,
+          onChangeText: (text) => {
+            setInputValues((old) => ({ ...old, maxInstallments: text }));
+          },
+        }}
       />
       <Button
         style={{ ...styles.button }}
         onLongPress={() => {}}
-        onPress={() => {
-          console.warn("Hello! I'm a Button.");
+        onPress={async () => {
+          await loanDB.create({
+            customerName: inputValues.customerName,
+            description: inputValues.description,
+            total: Number(inputValues.total),
+            maxInstallments: Number(inputValues.maxInstallments),
+          });
+          router.back()
         }}
       >
         ADICIONAR

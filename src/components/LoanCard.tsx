@@ -5,6 +5,7 @@ import Button from "./Button";
 import { useAppContext } from "@/contexts/AppContext";
 import { monetaryNumberToString } from "@/utils/monetary-value-converter";
 import { router } from "expo-router";
+import { TLoan } from "@/types/Loan";
 
 const styles = StyleSheet.create({
   view: {
@@ -44,14 +45,7 @@ const styles = StyleSheet.create({
 });
 
 type TLoanCardProps = {
-  data: {
-    id: number;
-    name: string;
-    total: number;
-    description: string;
-    maxInstallments: number;
-    paidInstallments: number;
-  };
+  data: TLoan;
 };
 const LoanCard: FC<TLoanCardProps> = ({ data }) => {
   const { changeNavigationMode, setSelectedLoan } = useAppContext();
@@ -70,7 +64,7 @@ const LoanCard: FC<TLoanCardProps> = ({ data }) => {
       <View style={{ ...styles.view }}>
         <View style={{ ...styles.infoView }}>
           <Text style={{ ...styles.label }}>Cliente</Text>
-          <Text style={{ ...styles.text }}>{data.name}</Text>
+          <Text style={{ ...styles.text }}>{data.customerName}</Text>
         </View>
         <View style={{ ...styles.infoView }}>
           <Text style={{ ...styles.label }}>Descrição</Text>

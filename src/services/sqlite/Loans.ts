@@ -1,8 +1,11 @@
 import db from "./db";
 
-type TCustomerDB = {
+type TLoanDB = {
   id: number;
-  name: string;
+  customerName: string;
+  total: number;
+  description: string;
+  maxInstallments: number;
 };
 
 /**
@@ -10,29 +13,37 @@ type TCustomerDB = {
  * - Executa sempre que app é iniciado. (Somente se outro arquivo chamar esse arquivo)
  */
 db.transaction((tx) => {
-  // tx.executeSql("DROP TABLE customers;");
+  // tx.executeSql("DROP TABLE loans;");
   tx.executeSql(
-    "CREATE TABLE IF NOT EXISTS customers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE);"
+    `CREATE TABLE IF NOT EXISTS loans (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        customerName TEXT NOT NULL,
+        total INT NOT NULL,
+        description TEXT NOT NULL,
+        maxInstallments INT NOT NULL,
+        FOREIGN KEY(customerName) REFERENCES customers(name) ON UPDATE CASCADE ON DELETE CASCADE
+      );
+    `
   );
 });
 
 /**
  * @returns Object created
  */
-async function create(obj: Omit<TCustomerDB, "id">) {
+async function create(obj: Omit<TLoanDB, "id">) {
   let id = 0;
   try {
     await db.transactionAsync(async (tx) => {
       const res = await tx.executeSqlAsync(
-        "INSERT INTO customers (name) values (?);",
-        [obj.name]
+        "INSERT INTO loans (customerName, total, description, maxInstallments) values (?, ?, ?, ?);",
+        [obj.customerName, obj.total, obj.description, obj.maxInstallments]
       );
       id = res.insertId ?? 0;
       if (!id) {
         throw "Failed to create new register.";
       }
     });
-    return { ...obj, id: id } as TCustomerDB;
+    return { ...obj, id: id } as TLoanDB;
   } catch (error) {
     console.error(error);
     throw error;
@@ -46,13 +57,13 @@ async function findAll() {
   let all: any[] = [];
   try {
     await db.transactionAsync(async (tx) => {
-      const res = await tx.executeSqlAsync("SELECT * FROM customers;", []);
+      const res = await tx.executeSqlAsync("SELECT * FROM loans;", []);
       all = res.rows;
       if (!all.length) {
         throw "Failed to find any data.";
       }
     });
-    return all as TCustomerDB[];
+    return all as TLoanDB[];
   } catch (error) {
     throw error;
   }
@@ -65,10 +76,9 @@ async function remove(id: number) {
   let affected = 0;
   try {
     await db.transactionAsync(async (tx) => {
-      const res = await tx.executeSqlAsync(
-        "DELETE FROM customers WHERE id=?;",
-        [id]
-      );
+      const res = await tx.executeSqlAsync("DELETE FROM loans WHERE id=?;", [
+        id,
+      ]);
       affected = res.rowsAffected;
       if (affected < 1) {
         throw "Failed to delete register.";
@@ -81,10 +91,10 @@ async function remove(id: number) {
   }
 }
 
-const customerDB = {
+const loanDB = {
   create,
   findAll,
   remove,
 };
 
-export default customerDB;
+export default loanDB;

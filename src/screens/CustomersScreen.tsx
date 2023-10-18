@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { FC } from "react";
 import { gSC, gStyles } from "@/styles/global";
 import CustomerCard from "@/components/CustomerCard";
@@ -14,9 +14,13 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   text: {
-    color: gSC("zinc200"),
-    fontSize: 50,
+    color: gSC("zinc100", 0.5),
+    fontSize: 20,
     paddingBottom: 20,
+    flex: 1,
+    textAlign: "center",
+    verticalAlign: "middle",
+    marginBottom: 60,
   },
 });
 
@@ -28,18 +32,26 @@ const CustomersScreen: FC<TCustomersScreenProps> = () => {
   });
 
   return (
-    <ScrollContainer style={{ paddingBottom: 70, paddingTop: 0 }}>
-      <View style={{ ...styles.view }}>
-        {customersData?.map((data, idx) => {
-          return (
-            <CustomerCard
-              key={idx}
-              data={{ ...data, total: 0 }}
-            />
-          );
-        })}
-      </View>
-    </ScrollContainer>
+    <>
+      {customersData ? (
+        <ScrollContainer style={{ paddingBottom: 70, paddingTop: 0 }}>
+          <View style={{ ...styles.view }}>
+            {customersData.map((data, idx) => {
+              return (
+                <CustomerCard
+                  key={idx}
+                  data={{ ...data, total: 0 }}
+                />
+              );
+            })}
+          </View>
+        </ScrollContainer>
+      ) : (
+        <Text style={{ ...styles.text }}>
+          Não há clientes registrados...
+        </Text>
+      )}
+    </>
   );
 };
 

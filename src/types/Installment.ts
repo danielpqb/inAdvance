@@ -6,3 +6,13 @@ export type TInstallment = {
   status: "Pago" | "Atrasado" | "Aguardando";
   value: number;
 };
+
+export type TInstallmentDB = {
+  id: number;
+  number: number;
+  maxInstallments: number;
+  date: string;
+  isPaid: number;
+  value: number;
+  loanId: number;
+};

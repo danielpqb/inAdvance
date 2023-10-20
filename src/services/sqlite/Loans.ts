@@ -1,12 +1,9 @@
+import { TLoanDB } from "@/types/Loan";
+import customerDB from "./Customers";
 import db from "./db";
-
-type TLoanDB = {
-  id: number;
-  customerName: string;
-  total: number;
-  description: string;
-  maxInstallments: number;
-};
+import installmentDB from "./Installments";
+import { getUtcDateNowString } from "@/utils/date-converter";
+import { TInstallmentDB } from "@/types/Installment";
 
 /**
  * INICIALIZAÇÃO DA TABELA
@@ -17,11 +14,11 @@ db.transaction((tx) => {
   tx.executeSql(
     `CREATE TABLE IF NOT EXISTS loans (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        customerName TEXT NOT NULL,
+        customerId INT NOT NULL,
         total INT NOT NULL,
         description TEXT NOT NULL,
         maxInstallments INT NOT NULL,
-        FOREIGN KEY(customerName) REFERENCES customers(name) ON UPDATE CASCADE ON DELETE CASCADE
+        FOREIGN KEY(customerId) REFERENCES customers(id) ON UPDATE CASCADE ON DELETE CASCADE
       );
     `
   );
@@ -30,24 +27,37 @@ db.transaction((tx) => {
 /**
  * @returns Object created
  */
-async function create(obj: Omit<TLoanDB, "id">) {
+async function createOrFail(obj: Omit<TLoanDB, "id">) {
+  const exists = await customerDB.customerIdExists(obj.customerId);
+  if (!exists) throw `Não existe um cliente com (id: ${obj.customerId}).`;
+
   let id = 0;
-  try {
-    await db.transactionAsync(async (tx) => {
-      const res = await tx.executeSqlAsync(
-        "INSERT INTO loans (customerName, total, description, maxInstallments) values (?, ?, ?, ?);",
-        [obj.customerName, obj.total, obj.description, obj.maxInstallments]
-      );
-      id = res.insertId ?? 0;
-      if (!id) {
-        throw "Failed to create new register.";
-      }
-    });
-    return { ...obj, id: id } as TLoanDB;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  await db.transactionAsync(async (tx) => {
+    const res = await tx.executeSqlAsync(
+      "INSERT INTO loans (customerId, total, description, maxInstallments) values (?, ?, ?, ?);",
+      [obj.customerId, obj.total, obj.description, obj.maxInstallments]
+    );
+    id = res.insertId ?? 0;
+    if (!id) {
+      throw "Erro ao criar novo empréstimo.";
+    }
+
+    const newInstallments = [] as Omit<TInstallmentDB, "id">[];
+    for (let i = 1; i <= obj.maxInstallments; i++) {
+      newInstallments.push({
+        loanId: id,
+        isPaid: 0,
+        number: i,
+        maxInstallments: obj.maxInstallments,
+        value: obj.total / obj.maxInstallments,
+        date: getUtcDateNowString({ offsetMonths: i }),
+      });
+    }
+
+    installmentDB.createManyOrFail(newInstallments);
+  });
+
+  return { ...obj, id: id } as TLoanDB;
 }
 
 /**
@@ -55,18 +65,16 @@ async function create(obj: Omit<TLoanDB, "id">) {
  */
 async function findAll() {
   let all: any[] = [];
-  try {
-    await db.transactionAsync(async (tx) => {
-      const res = await tx.executeSqlAsync("SELECT * FROM loans;", []);
-      all = res.rows;
-      if (!all.length) {
-        throw "Failed to find any data.";
-      }
-    });
-    return all as TLoanDB[];
-  } catch (error) {
-    throw error;
-  }
+  await db.transactionAsync(async (tx) => {
+    const res = await tx.executeSqlAsync(
+      `SELECT *, customers.name AS customerName
+      FROM loans
+      JOIN customers ON loans.customerId = customers.id;`,
+      []
+    );
+    all = res.rows;
+  });
+  return all as (TLoanDB & { customerName: string })[];
 }
 
 /**
@@ -74,25 +82,18 @@ async function findAll() {
  */
 async function remove(id: number) {
   let affected = 0;
-  try {
-    await db.transactionAsync(async (tx) => {
-      const res = await tx.executeSqlAsync("DELETE FROM loans WHERE id=?;", [
-        id,
-      ]);
-      affected = res.rowsAffected;
-      if (affected < 1) {
-        throw "Failed to delete register.";
-      }
-    });
-    return affected;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  await db.transactionAsync(async (tx) => {
+    const res = await tx.executeSqlAsync("DELETE FROM loans WHERE id=?;", [id]);
+    affected = res.rowsAffected;
+    if (affected < 1) {
+      throw "Nenhum empréstimo foi removido.";
+    }
+  });
+  return affected;
 }
 
 const loanDB = {
-  create,
+  createOrFail,
   findAll,
   remove,
 };

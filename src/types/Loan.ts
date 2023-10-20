@@ -6,3 +6,11 @@ export type TLoan = {
   maxInstallments: number;
   paidInstallments: number;
 };
+
+export type TLoanDB = {
+  id: number;
+  customerId: number;
+  total: number;
+  description: string;
+  maxInstallments: number;
+};

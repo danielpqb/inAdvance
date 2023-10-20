@@ -127,7 +127,7 @@ const InstallmentCard: FC<TInstallmentCardProps> = ({ data }) => {
           >
             {`R$ `}
             <Text style={{ fontSize: 24 }}>
-              {monetaryNumberToString(data.value)}
+              {monetaryNumberToString(Math.ceil(data.value))}
             </Text>
           </Text>
         </View>

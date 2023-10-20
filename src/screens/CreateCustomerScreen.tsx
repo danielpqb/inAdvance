@@ -5,6 +5,7 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import customerDB from "@/services/sqlite/Customers";
 import { router } from "expo-router";
+import { useMutation } from "@tanstack/react-query";
 
 const styles = StyleSheet.create({
   view: {
@@ -28,6 +29,11 @@ type TCreateCustomerScreenProps = {};
 const CreateCustomerScreen: FC<TCreateCustomerScreenProps> = () => {
   const [inputValue, setInputValue] = useState("");
 
+  const createCustomer = useMutation({
+    mutationFn: customerDB.createOrFail,
+    mutationKey: ["createCustomer"],
+  });
+
   return (
     <View style={{ ...styles.view }}>
       <Input
@@ -44,8 +50,12 @@ const CreateCustomerScreen: FC<TCreateCustomerScreenProps> = () => {
         style={{ ...styles.button }}
         onLongPress={() => {}}
         onPress={async () => {
-          await customerDB.create({ name: inputValue });
-          router.back();
+          try {
+            await createCustomer.mutateAsync({ name: inputValue });
+            router.back();
+          } catch (error) {
+            console.error(error);
+          }
         }}
       >
         ADICIONAR

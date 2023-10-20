@@ -168,13 +168,13 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
             onLongPress={() => {}}
             onPress={async () => {
               if (
-                selectedCustomer?.name &&
+                selectedCustomer?.id &&
                 inputValues.description &&
                 Number(inputValues.total) &&
                 Number(inputValues.maxInstallments)
               ) {
-                await loanDB.create({
-                  customerName: selectedCustomer.name,
+                await loanDB.createOrFail({
+                  customerId: selectedCustomer.id,
                   description: inputValues.description,
                   total: Number(inputValues.total),
                   maxInstallments: Number(inputValues.maxInstallments),

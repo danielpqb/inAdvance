@@ -5,6 +5,7 @@ import CustomerCard from "@/components/CustomerCard";
 import ScrollContainer from "@/components/ScrollContainer";
 import customerDB from "@/services/sqlite/Customers";
 import { useQuery } from "@tanstack/react-query";
+import allDB from "@/services/sqlite/All";
 
 const styles = StyleSheet.create({
   view: {
@@ -26,33 +27,63 @@ const styles = StyleSheet.create({
 
 type TCustomersScreenProps = {};
 const CustomersScreen: FC<TCustomersScreenProps> = () => {
-  const { data: customersData } = useQuery({
+  const {
+    data: customersData,
+    status,
+    error,
+  } = useQuery({
     queryKey: ["customers"],
     queryFn: customerDB.findAll,
   });
 
-  return (
-    <>
-      {customersData ? (
-        <ScrollContainer style={{ paddingBottom: 70, paddingTop: 0 }}>
-          <View style={{ ...styles.view }}>
-            {customersData.map((data, idx) => {
-              return (
-                <CustomerCard
-                  key={idx}
-                  data={{ ...data, total: 0 }}
-                />
-              );
-            })}
-          </View>
-        </ScrollContainer>
-      ) : (
-        <Text style={{ ...styles.text }}>
-          Não há clientes registrados...
-        </Text>
-      )}
-    </>
-  );
+  const {
+    data: allData,
+    status: allDataStatus,
+    error: allDataError,
+  } = useQuery({
+    queryKey: ["allData"],
+    queryFn: allDB.allData,
+  });
+
+  if (status === "pending" || allDataStatus === "pending") {
+    return <Text style={{ ...styles.text }}>Carregando...</Text>;
+  }
+
+  if (status === "error" || allDataStatus === "error") {
+    return (
+      <Text style={{ ...styles.text, color: gSC("red600") }}>
+        {error?.message}
+        {"\n"}
+        {allDataError?.message}
+      </Text>
+    );
+  }
+
+  if (
+    status === "success" &&
+    allDataStatus === "success" &&
+    customersData.length > 0
+  ) {
+    return (
+      <ScrollContainer style={{ paddingBottom: 70, paddingTop: 0 }}>
+        <View style={{ ...styles.view }}>
+          {customersData.map((data, idx) => {
+            return (
+              <CustomerCard
+                key={idx}
+                data={{
+                  ...data,
+                  total: allData?.customers[data.id].remainToPay ?? 0,
+                }}
+              />
+            );
+          })}
+        </View>
+      </ScrollContainer>
+    );
+  }
+  
+  return <Text style={{ ...styles.text }}>Não há clientes registrados...</Text>;
 };
 
 export default CustomersScreen;

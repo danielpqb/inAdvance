@@ -1,9 +1,5 @@
+import { TCustomerDB } from "@/types/Customer";
 import db from "./db";
-
-type TCustomerDB = {
-  id: number;
-  name: string;
-};
 
 /**
  * INICIALIZAÇÃO DA TABELA
@@ -17,26 +13,75 @@ db.transaction((tx) => {
 });
 
 /**
+ * @returns true/false
+ */
+async function customerNameExists(name: string) {
+  let exists = true;
+  await db.transactionAsync(async (tx) => {
+    const res = await tx.executeSqlAsync(
+      "SELECT * FROM customers WHERE name=?;",
+      [name]
+    );
+    exists = res.rows.length > 0;
+  });
+  return exists;
+}
+
+/**
+ * @returns true/false
+ */
+async function customerIdExists(id: number) {
+  let exists = true;
+  await db.transactionAsync(async (tx) => {
+    const res = await tx.executeSqlAsync(
+      "SELECT * FROM customers WHERE id=?;",
+      [id]
+    );
+    exists = res.rows.length > 0;
+  });
+  return exists;
+}
+
+/**
  * @returns Object created
  */
-async function create(obj: Omit<TCustomerDB, "id">) {
+async function createOrFail(obj: Omit<TCustomerDB, "id">) {
   let id = 0;
-  try {
-    await db.transactionAsync(async (tx) => {
-      const res = await tx.executeSqlAsync(
-        "INSERT INTO customers (name) values (?);",
-        [obj.name]
-      );
-      id = res.insertId ?? 0;
-      if (!id) {
-        throw "Failed to create new register.";
-      }
-    });
-    return { ...obj, id: id } as TCustomerDB;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  await db.transactionAsync(async (tx) => {
+    const name = obj.name.trim();
+    const customerExists = await customerNameExists(name);
+    if (customerExists) {
+      throw "Nome de cliente já existe.";
+    }
+
+    const res = await tx.executeSqlAsync(
+      "INSERT INTO customers (name) VALUES (?);",
+      [name]
+    );
+    id = res.insertId ?? 0;
+    if (!id) {
+      throw "Erro ao criar novo cliente.";
+    }
+  });
+  return { ...obj, id: id, name: obj.name.trim() } as TCustomerDB;
+}
+
+/**
+ * @returns Object found
+ */
+async function find(id: number) {
+  let obj = null;
+  await db.transactionAsync(async (tx) => {
+    const res = await tx.executeSqlAsync(
+      "SELECT * FROM customers WHERE id=?;",
+      [id]
+    );
+    const exists = res.rows.length > 0;
+    if (exists) {
+      obj = res.rows[0];
+    }
+  });
+  return obj as TCustomerDB | null;
 }
 
 /**
@@ -44,18 +89,11 @@ async function create(obj: Omit<TCustomerDB, "id">) {
  */
 async function findAll() {
   let all: any[] = [];
-  try {
-    await db.transactionAsync(async (tx) => {
-      const res = await tx.executeSqlAsync("SELECT * FROM customers;", []);
-      all = res.rows;
-      if (!all.length) {
-        throw "Failed to find any data.";
-      }
-    });
-    return all as TCustomerDB[];
-  } catch (error) {
-    throw error;
-  }
+  await db.transactionAsync(async (tx) => {
+    const res = await tx.executeSqlAsync("SELECT * FROM customers;", []);
+    all = res.rows;
+  });
+  return all as TCustomerDB[];
 }
 
 /**
@@ -63,26 +101,20 @@ async function findAll() {
  */
 async function remove(id: number) {
   let affected = 0;
-  try {
-    await db.transactionAsync(async (tx) => {
-      const res = await tx.executeSqlAsync(
-        "DELETE FROM customers WHERE id=?;",
-        [id]
-      );
-      affected = res.rowsAffected;
-      if (affected < 1) {
-        throw "Failed to delete register.";
-      }
-    });
-    return affected;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  await db.transactionAsync(async (tx) => {
+    const res = await tx.executeSqlAsync("DELETE FROM customers WHERE id=?;", [
+      id,
+    ]);
+    affected = res.rowsAffected;
+  });
+  return affected;
 }
 
 const customerDB = {
-  create,
+  customerIdExists,
+  customerNameExists,
+  createOrFail,
+  find,
   findAll,
   remove,
 };

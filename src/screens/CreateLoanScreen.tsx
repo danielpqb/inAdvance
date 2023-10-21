@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import customerDB from "@/services/sqlite/Customers";
 import { TCustomer } from "@/types/Customer";
 import { ScrollView } from "react-native-gesture-handler";
+import CurrencyInput from "react-native-currency-input";
 
 const styles = StyleSheet.create({
   view: {
@@ -96,6 +97,8 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
               label="Cliente"
               inputStyle={{ ...styles.input }}
               inputProps={{
+                multiline: false,
+                maxLength: 80,
                 placeholder: "Digite para pesquisar...",
                 value: inputValues.customerName,
                 onChangeText: (text) => {
@@ -135,27 +138,44 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
             label="Descrição"
             inputStyle={{ ...styles.input }}
             inputProps={{
+              maxLength: 80,
+              multiline: false,
               value: inputValues.description,
               onChangeText: (text) => {
                 setInputValues((old) => ({ ...old, description: text }));
               },
             }}
           />
-          <Input
-            label="Valor Total"
-            inputStyle={{ ...styles.input }}
-            inputProps={{
-              keyboardType: "number-pad",
-              value: inputValues.total,
-              onChangeText: (text) => {
-                setInputValues((old) => ({ ...old, total: text }));
-              },
-            }}
+          <CurrencyInput
+            value={Number(inputValues.total) || null}
+            onChangeValue={(val) =>
+              setInputValues((old) => {
+                return { ...old, total: val ? val.toString() : "" };
+              })
+            }
+            style={{ ...styles.input }}
+            prefix="R$ "
+            delimiter="."
+            separator=","
+            precision={2}
+            minValue={0}
+            maxLength={15}
+            placeholder="R$ 0,00"
+            keyboardType="number-pad"
+            renderTextInput={(textInputProps) => (
+              <Input
+                label="Valor Total"
+                inputProps={{
+                  ...textInputProps,
+                }}
+              />
+            )}
           />
           <Input
             label="Número de Parcelas"
             inputStyle={{ ...styles.input }}
             inputProps={{
+              maxLength: 2,
               keyboardType: "number-pad",
               value: inputValues.maxInstallments,
               onChangeText: (text) => {

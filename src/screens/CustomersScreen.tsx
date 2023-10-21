@@ -73,7 +73,7 @@ const CustomersScreen: FC<TCustomersScreenProps> = () => {
                 key={idx}
                 data={{
                   ...data,
-                  total: allData?.customers[data.id].remainToPay ?? 0,
+                  total: allData.customers[data.id]?.remainToPay ?? 0,
                 }}
               />
             );
@@ -82,7 +82,7 @@ const CustomersScreen: FC<TCustomersScreenProps> = () => {
       </ScrollContainer>
     );
   }
-  
+
   return <Text style={{ ...styles.text }}>Não há clientes registrados...</Text>;
 };
 

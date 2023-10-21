@@ -52,64 +52,80 @@ type TLoanCardProps = {
 const LoanCard: FC<TLoanCardProps> = ({ data }) => {
   const { changeNavigationMode, setSelectedLoan } = useAppContext();
 
-  const { data: allData, status: allDataStatus } = useQuery({
+  const {
+    data: allData,
+    status: allDataStatus,
+    error,
+  } = useQuery({
     queryKey: ["allData"],
     queryFn: allDB.allData,
   });
 
-  return (
-    <>
-      {allDataStatus === "success" ? (
-        <Button
-          style={{ ...styles.button }}
-          onLongPress={() => {
-            changeNavigationMode("delete");
-          }}
-          onPress={() => {
-            setSelectedLoan(data);
-            router.push(`/loans/${data.id}`);
-          }}
-        >
-          <View style={{ ...styles.view }}>
-            <View style={{ ...styles.infoView }}>
-              <Text style={{ ...styles.label }}>Cliente</Text>
-              <Text style={{ ...styles.text }}>{data.customerName}</Text>
+  if (allDataStatus === "pending") {
+    return <Text style={{ ...styles.text }}>Carregando...</Text>;
+  }
+
+  if (allDataStatus === "error") {
+    return (
+      <Text style={{ ...styles.text, color: gSC("red600") }}>
+        {error?.message}
+      </Text>
+    );
+  }
+
+  if (allDataStatus === "success") {
+    return (
+      <Button
+        style={{ ...styles.button }}
+        onLongPress={() => {
+          changeNavigationMode("delete");
+        }}
+        onPress={() => {
+          setSelectedLoan(data);
+          router.push(`/loans/${data.id}`);
+        }}
+      >
+        <View style={{ ...styles.view }}>
+          <View style={{ ...styles.infoView }}>
+            <Text style={{ ...styles.label }}>Cliente</Text>
+            <Text style={{ ...styles.text }}>{data.customerName}</Text>
+          </View>
+          <View style={{ ...styles.infoView }}>
+            <Text style={{ ...styles.label }}>Descrição</Text>
+            <Text style={{ ...styles.text }}>{data.description}</Text>
+          </View>
+          <View style={{ ...styles.bottomView }}>
+            <View style={{ ...styles.bottomInfoView }}>
+              <Text style={{ ...styles.bottomInfoLabel }}>
+                Restante a Pagar
+              </Text>
+              <Text style={{ ...styles.bottomInfoText }}>
+                <Text style={{ fontSize: 16 }}>R$ </Text>
+                {monetaryNumberToString(
+                  allData.loans[data.id]?.remainToPay ?? 0
+                )}
+              </Text>
             </View>
-            <View style={{ ...styles.infoView }}>
-              <Text style={{ ...styles.label }}>Descrição</Text>
-              <Text style={{ ...styles.text }}>{data.description}</Text>
-            </View>
-            <View style={{ ...styles.bottomView }}>
-              <View style={{ ...styles.bottomInfoView }}>
-                <Text style={{ ...styles.bottomInfoLabel }}>
-                  Restante a Pagar
-                </Text>
-                <Text style={{ ...styles.bottomInfoText }}>
-                  <Text style={{ fontSize: 16 }}>R$ </Text>
-                  {monetaryNumberToString(allData.loans[data.id].remainToPay)}
-                </Text>
-              </View>
-              <View style={{ ...styles.bottomInfoView }}>
-                <Text style={{ ...styles.bottomInfoLabel, textAlign: "right" }}>
-                  Parcelas Pagas
-                </Text>
-                <Text style={{ ...styles.bottomInfoText, textAlign: "right" }}>
-                  {data.paidInstallments}
-                  <Text
-                    style={{
-                      fontSize: 20,
-                      fontWeight: "600",
-                      color: gSC("zinc100"),
-                    }}
-                  >{` / ${data.maxInstallments}`}</Text>
-                </Text>
-              </View>
+            <View style={{ ...styles.bottomInfoView }}>
+              <Text style={{ ...styles.bottomInfoLabel, textAlign: "right" }}>
+                Parcelas Pagas
+              </Text>
+              <Text style={{ ...styles.bottomInfoText, textAlign: "right" }}>
+                {data.paidInstallments}
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: "600",
+                    color: gSC("zinc100"),
+                  }}
+                >{` / ${data.maxInstallments}`}</Text>
+              </Text>
             </View>
           </View>
-        </Button>
-      ) : null}
-    </>
-  );
+        </View>
+      </Button>
+    );
+  }
 };
 
 export default LoanCard;

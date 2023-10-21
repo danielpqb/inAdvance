@@ -74,7 +74,7 @@ const LoansScreen: FC<TLoansScreenProps> = () => {
                 key={idx}
                 data={{
                   ...data,
-                  paidInstallments: allData.loans[data.id].paid,
+                  paidInstallments: allData.loans[data.id]?.paid ?? 0,
                   customerName: data.customerName,
                 }}
               />

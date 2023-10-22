@@ -34,7 +34,7 @@ async function allData() {
     if (!loanIdExist) {
       loansObj[row.loanId] = {
         customerId: row.customerId,
-        remainToPay: row.value,
+        remainToPay: row.isPaid ? 0 : row.value,
         paid: row.isPaid,
       };
     } else {
@@ -48,7 +48,7 @@ async function allData() {
   const customersObj = {} as TCustomersObj;
   for (const loanId in loansObj) {
     const { customerId, remainToPay } = loansObj[loanId];
-    
+
     const customerIdExists = !!customersObj[customerId] as boolean;
     if (!customerIdExists) {
       customersObj[customerId] = { remainToPay: remainToPay };

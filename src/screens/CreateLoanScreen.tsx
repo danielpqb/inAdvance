@@ -11,7 +11,7 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import loanDB from "@/services/sqlite/Loans";
 import { router } from "expo-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import customerDB from "@/services/sqlite/Customers";
 import { TCustomer } from "@/types/Customer";
 import { ScrollView } from "react-native-gesture-handler";
@@ -66,6 +66,12 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
     total: "",
     maxInstallments: "",
   });
+  const [inputErrorMsg, setInputErrorMsg] = useState({
+    customerName: "",
+    description: "",
+    total: "",
+    maxInstallments: "",
+  });
   const { data: customersData } = useQuery({
     queryKey: ["customers"],
     queryFn: customerDB.findAll,
@@ -77,6 +83,33 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(
     null as Partial<TCustomer> | null
   );
+
+  function filterCustomers({
+    maxSize,
+    searchText,
+  }: {
+    maxSize: number;
+    searchText: string;
+  }) {
+    if (customersData) {
+      const filtered = [];
+      for (let i = 0; i < customersData.length; i++) {
+        const customer = customersData[i];
+        const isMatch = customer.name
+          .toUpperCase()
+          .includes(searchText.toUpperCase());
+        if (isMatch) filtered.push(customer);
+        if (filtered.length >= maxSize) return filtered;
+      }
+      return filtered;
+    }
+    return [];
+  }
+
+  const createLoan = useMutation({
+    mutationKey: ["createLoan"],
+    mutationFn: loanDB.createOrFail,
+  });
 
   return (
     <>
@@ -95,6 +128,7 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
           >
             <Input
               label="Cliente"
+              errorMessage={inputErrorMsg.customerName}
               inputStyle={{ ...styles.input }}
               inputProps={{
                 multiline: false,
@@ -104,38 +138,33 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
                 onChangeText: (text) => {
                   setInputValues((old) => ({ ...old, customerName: text }));
                   setSearchedCustomers(
-                    customersData
-                      ? customersData.filter((customer) => {
-                          if (!text) return false;
-                          return customer.name
-                            .toUpperCase()
-                            .includes(text.toUpperCase());
-                        })
-                      : []
+                    filterCustomers({ maxSize: 4, searchText: text })
                   );
                 },
                 onFocus: () => {
-                  const text = selectedCustomer?.name ?? "";
+                  setSelectedCustomer(null);
+                  const text = inputValues.customerName;
                   setSearchedCustomers(
-                    customersData
-                      ? customersData.filter((customer) => {
-                          if (!text) return false;
-                          return customer.name
-                            .toUpperCase()
-                            .includes(text.toUpperCase());
-                        })
-                      : []
+                    filterCustomers({ maxSize: 4, searchText: text })
                   );
                   setCustomerInputOnFocus(true);
                 },
                 onBlur: () => {
                   setCustomerInputOnFocus(false);
+                  if (!selectedCustomer?.id) {
+                    setInputValues((old) => ({ ...old, customerName: "" }));
+                    setInputErrorMsg((old) => ({
+                      ...old,
+                      customerName: "Selecione um Cliente.",
+                    }));
+                  }
                 },
               }}
             />
           </View>
           <Input
             label="Descrição"
+            errorMessage={inputErrorMsg.description}
             inputStyle={{ ...styles.input }}
             inputProps={{
               maxLength: 80,
@@ -165,6 +194,7 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
             renderTextInput={(textInputProps) => (
               <Input
                 label="Valor Total"
+                errorMessage={inputErrorMsg.total}
                 inputProps={{
                   ...textInputProps,
                 }}
@@ -173,6 +203,7 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
           />
           <Input
             label="Número de Parcelas"
+            errorMessage={inputErrorMsg.maxInstallments}
             inputStyle={{ ...styles.input }}
             inputProps={{
               maxLength: 2,
@@ -187,13 +218,19 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
             style={{ ...styles.button }}
             onLongPress={() => {}}
             onPress={async () => {
+              setInputErrorMsg({
+                customerName: "",
+                description: "",
+                maxInstallments: "",
+                total: "",
+              });
               if (
                 selectedCustomer?.id &&
                 inputValues.description &&
                 Number(inputValues.total) &&
                 Number(inputValues.maxInstallments)
               ) {
-                await loanDB.createOrFail({
+                await createLoan.mutateAsync({
                   customerId: selectedCustomer.id,
                   description: inputValues.description,
                   total: Number(inputValues.total),
@@ -201,6 +238,27 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
                 });
                 router.back();
               }
+              if (!selectedCustomer?.id)
+                setInputErrorMsg((old) => ({
+                  ...old,
+                  customerName: "Selecione um Cliente.",
+                }));
+              if (!inputValues.description)
+                setInputErrorMsg((old) => {
+                  old["description"] = "Preencha a descrição.";
+                  return old;
+                });
+              if (!Number(inputValues.total))
+                setInputErrorMsg((old) => {
+                  old["total"] = "Valor total deve ser maior que zero.";
+                  return old;
+                });
+              if (!Number(inputValues.maxInstallments))
+                setInputErrorMsg((old) => {
+                  old["maxInstallments"] =
+                    "Nº de Parcelas deve ser maior que zero.";
+                  return old;
+                });
             }}
           >
             ADICIONAR
@@ -226,6 +284,7 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
                 }}
                 pressedStyle={{ ...styles.inputSearchButtonPressed }}
                 onPress={() => {
+                  setInputErrorMsg((old) => ({ ...old, customerName: "" }));
                   setSelectedCustomer(customer);
                   setInputValues((old) => ({
                     ...old,

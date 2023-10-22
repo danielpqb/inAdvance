@@ -7,6 +7,7 @@ import InstallmentCard from "@/components/InstallmentCard";
 import { useQuery } from "@tanstack/react-query";
 import installmentDB from "@/services/sqlite/Installments";
 import { convertDateStringFormat } from "@/utils/date-converter";
+import Button from "@/components/Button";
 
 const styles = StyleSheet.create({
   view: {
@@ -16,14 +17,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   input: {},
-  button: {
-    backgroundColor: gSC("emerald600"),
-    width: "100%",
-    height: 50,
-    fontSize: 16,
-    fontWeight: "700",
-    marginTop: 10,
-  },
   text: {
     color: gSC("zinc100", 0.5),
     fontSize: 20,

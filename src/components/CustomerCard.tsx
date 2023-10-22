@@ -1,5 +1,5 @@
 import { gSC, gStyles } from "@/styles/global";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import Button from "./Button";
 import { useAppContext } from "@/contexts/AppContext";
@@ -18,6 +18,11 @@ const styles = StyleSheet.create({
     borderColor: gSC("zinc300", 0.2),
     gap: 10,
     width: "100%",
+  },
+  selectedCard: {
+    borderWidth: 5,
+    borderColor: gSC("red800"),
+    backgroundColor: gSC("white", 0.15),
   },
   name: {
     color: gSC("zinc100"),
@@ -52,6 +57,7 @@ type TCustomerCardProps = {
 };
 const CustomerCard: FC<TCustomerCardProps> = ({ data }) => {
   const { changeNavigationMode, setSelectedCustomer } = useAppContext();
+  const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {
     setSelectedCustomer({} as TCustomer);
@@ -62,19 +68,25 @@ const CustomerCard: FC<TCustomerCardProps> = ({ data }) => {
       style={{ ...styles.button }}
       onLongPress={() => {
         changeNavigationMode("delete");
+        setIsSelected(!isSelected);
       }}
       onPress={() => {
         setSelectedCustomer(data);
         router.push("/loans");
       }}
     >
-      <View style={{ ...styles.view }}>
+      <View
+        style={{
+          ...styles.view,
+          ...(isSelected ? { ...styles.selectedCard } : {}),
+        }}
+      >
         <Text style={{ ...styles.name }}>{data.name}</Text>
         <View style={{ ...styles.totalView }}>
           <Text style={{ ...styles.totalLabel }}>Total a Pagar</Text>
           <Text style={{ ...styles.totalNumber }}>
             <Text style={{ fontSize: 16 }}>R$ </Text>
-            {monetaryNumberToString(data.total)}
+            {monetaryNumberToString(Math.ceil(data.total))}
           </Text>
         </View>
       </View>

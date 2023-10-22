@@ -101,12 +101,31 @@ async function removeMany(ids: number[]) {
   return affected;
 }
 
+/**
+ * @returns Number of rows updated
+ */
+async function updateIsPaidOrFail(data: { id: number; isPaid: number }) {
+  let affected = 0;
+  await db.transactionAsync(async (tx) => {
+    const res = await tx.executeSqlAsync(
+      "UPDATE installments SET isPaid=? WHERE id=?;",
+      [data.isPaid, data.id]
+    );
+    affected = res.rowsAffected;
+    if (affected < 1) {
+      throw "Falha ao atualizar status da parcela.";
+    }
+  });
+  return affected;
+}
+
 const installmentDB = {
   createOrFail,
   createManyOrFail,
   findAll,
   remove,
   removeMany,
+  updateIsPaidOrFail,
 };
 
 export default installmentDB;

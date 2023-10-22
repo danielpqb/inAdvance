@@ -1,5 +1,5 @@
 import { gSC, gStyles } from "@/styles/global";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import Button from "./Button";
 import { useAppContext } from "@/contexts/AppContext";
@@ -20,6 +20,11 @@ const styles = StyleSheet.create({
     borderColor: gSC("zinc300", 0.2),
     gap: 5,
     width: "100%",
+  },
+  selectedCard: {
+    borderWidth: 5,
+    borderColor: gSC("red800"),
+    backgroundColor: gSC("white", 0.15),
   },
   button: {
     backgroundColor: undefined,
@@ -51,6 +56,7 @@ type TLoanCardProps = {
 };
 const LoanCard: FC<TLoanCardProps> = ({ data }) => {
   const { changeNavigationMode, setSelectedLoan } = useAppContext();
+  const [isSelected, setIsSelected] = useState(false);
 
   const {
     data: allData,
@@ -79,13 +85,19 @@ const LoanCard: FC<TLoanCardProps> = ({ data }) => {
         style={{ ...styles.button }}
         onLongPress={() => {
           changeNavigationMode("delete");
+          setIsSelected(!isSelected);
         }}
         onPress={() => {
           setSelectedLoan(data);
           router.push(`/loans/${data.id}`);
         }}
       >
-        <View style={{ ...styles.view }}>
+        <View
+          style={{
+            ...styles.view,
+            ...(isSelected ? { ...styles.selectedCard } : {}),
+          }}
+        >
           <View style={{ ...styles.infoView }}>
             <Text style={{ ...styles.label }}>Cliente</Text>
             <Text style={{ ...styles.text }}>{data.customerName}</Text>
@@ -102,7 +114,7 @@ const LoanCard: FC<TLoanCardProps> = ({ data }) => {
               <Text style={{ ...styles.bottomInfoText }}>
                 <Text style={{ fontSize: 16 }}>R$ </Text>
                 {monetaryNumberToString(
-                  allData.loans[data.id]?.remainToPay ?? 0
+                  Math.ceil(allData.loans[data.id]?.remainToPay) || 0
                 )}
               </Text>
             </View>

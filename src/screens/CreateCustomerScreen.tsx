@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
 type TCreateCustomerScreenProps = {};
 const CreateCustomerScreen: FC<TCreateCustomerScreenProps> = () => {
   const [inputValue, setInputValue] = useState("");
+  const [inputErrorMsg, setInputErrorMsg] = useState("");
 
   const createCustomer = useMutation({
     mutationFn: customerDB.createOrFail,
@@ -38,8 +39,11 @@ const CreateCustomerScreen: FC<TCreateCustomerScreenProps> = () => {
     <View style={{ ...styles.view }}>
       <Input
         label="Nome"
+        errorMessage={inputErrorMsg}
         inputStyle={{ ...styles.input }}
         inputProps={{
+          multiline:false,
+          maxLength: 80,
           value: inputValue,
           onChangeText: (text) => {
             setInputValue(text);
@@ -54,7 +58,7 @@ const CreateCustomerScreen: FC<TCreateCustomerScreenProps> = () => {
             await createCustomer.mutateAsync({ name: inputValue });
             router.back();
           } catch (error) {
-            console.error(error);
+            setInputErrorMsg(error as string)
           }
         }}
       >

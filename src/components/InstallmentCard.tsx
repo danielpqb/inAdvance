@@ -4,6 +4,9 @@ import { FC } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { TInstallment } from "@/types/Installment";
+import Button from "./Button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import installmentDB from "@/services/sqlite/Installments";
 
 const styles = StyleSheet.create({
   view: {
@@ -16,6 +19,10 @@ const styles = StyleSheet.create({
     borderColor: gSC("zinc300", 0.2),
     gap: 15,
     width: "100%",
+  },
+  cardPaid: {
+    borderWidth: 5,
+    borderColor: gSC("emerald600"),
   },
   button: {
     backgroundColor: undefined,
@@ -66,73 +73,99 @@ const InstallmentCard: FC<TInstallmentCardProps> = ({ data }) => {
       break;
   }
 
+  const queryClient = useQueryClient();
+  const updateInstallment = useMutation({
+    mutationKey: ["updateInstallment"],
+    mutationFn: installmentDB.updateIsPaidOrFail,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["installments"],
+      });
+    },
+  });
+
   return (
-    <View style={{ ...styles.view }}>
-      <View style={{ ...styles.rowContainer }}>
-        <View>
-          <Text style={{ ...styles.label }}>N° da Parcela</Text>
-          <Text style={{ ...styles.text, fontSize: 20 }}>
-            <Text
-              style={{
-                fontSize: 24,
-                color: gSC("yellow300"),
-                fontWeight: "700",
-              }}
-            >
-              {data.number}
+    <Button
+      style={{ ...styles.button }}
+      onLongPress={async () => {
+        await updateInstallment.mutateAsync({
+          id: data.id,
+          isPaid: data.status === "Pago" ? 0 : 1,
+        });
+      }}
+    >
+      <View
+        style={{
+          ...styles.view,
+          ...(data.status === "Pago" ? { ...styles.cardPaid } : {}),
+        }}
+      >
+        <View style={{ ...styles.rowContainer }}>
+          <View>
+            <Text style={{ ...styles.label }}>N° da Parcela</Text>
+            <Text style={{ ...styles.text, fontSize: 20 }}>
+              <Text
+                style={{
+                  fontSize: 24,
+                  color: gSC("yellow300"),
+                  fontWeight: "700",
+                }}
+              >
+                {data.number}
+              </Text>
+              {` / ${data.installments}`}
             </Text>
-            {` / ${data.installments}`}
-          </Text>
+          </View>
+          <View>
+            <Text style={{ ...styles.label, textAlign: "right" }}>
+              Vencimento
+            </Text>
+            <Text style={{ ...styles.text, textAlign: "right" }}>
+              {data.date}
+            </Text>
+          </View>
         </View>
-        <View>
-          <Text style={{ ...styles.label, textAlign: "right" }}>
-            Vencimento
-          </Text>
-          <Text style={{ ...styles.text, textAlign: "right" }}>
-            {data.date}
-          </Text>
-        </View>
-      </View>
-      <View style={{ ...styles.rowContainer }}>
-        <View style={{ flex: 1 }}>
-          <Text style={{ ...styles.label }}>Status</Text>
-          <View style={{ ...styles.statusView }}>
+        <View style={{ ...styles.rowContainer }}>
+          <View style={{ flex: 1 }}>
+            <Text style={{ ...styles.label }}>Status</Text>
+            <View style={{ ...styles.statusView }}>
+              <Text
+                style={{
+                  ...styles.text,
+                  fontSize: 20,
+                  color: gSC(statusIconData.color),
+                }}
+              >
+                {data.status}
+              </Text>
+              <Ionicons
+                name={statusIconData.name as any}
+                size={22}
+                color={gSC(statusIconData.color)}
+                style={{ marginTop: 3 }}
+              />
+            </View>
+          </View>
+          <View>
+            <Text style={{ ...styles.label, textAlign: "right" }}>
+              Valor da Parcela
+            </Text>
             <Text
               style={{
                 ...styles.text,
-                fontSize: 20,
-                color: gSC(statusIconData.color),
+                textAlign: "right",
+                color: gSC("yellow300"),
               }}
             >
-              {data.status}
+              {`R$ `}
+              <Text style={{ fontSize: 24 }}>
+                {monetaryNumberToString(Math.ceil(data.value))}
+              </Text>
             </Text>
-            <Ionicons
-              name={statusIconData.name as any}
-              size={22}
-              color={gSC(statusIconData.color)}
-              style={{ marginTop: 3 }}
-            />
           </View>
         </View>
-        <View>
-          <Text style={{ ...styles.label, textAlign: "right" }}>
-            Valor da Parcela
-          </Text>
-          <Text
-            style={{
-              ...styles.text,
-              textAlign: "right",
-              color: gSC("yellow300"),
-            }}
-          >
-            {`R$ `}
-            <Text style={{ fontSize: 24 }}>
-              {monetaryNumberToString(Math.ceil(data.value))}
-            </Text>
-          </Text>
-        </View>
       </View>
-    </View>
+    </Button>
   );
 };
 

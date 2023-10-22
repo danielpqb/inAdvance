@@ -8,9 +8,12 @@ import {
   ViewStyle,
 } from "react-native";
 import { gSC } from "@/styles/global";
+import { Ionicons } from "@expo/vector-icons";
 
 const styles = StyleSheet.create({
   container: { width: "100%" },
+  errorContainer: { flexDirection: "row" },
+  errorText: { color: gSC("red800") },
   label: { fontWeight: "600", color: gSC("emerald600"), fontSize: 16 },
   input: {
     backgroundColor: gSC("white", 0.1),
@@ -23,6 +26,7 @@ const styles = StyleSheet.create({
 
 type InputProps = {
   label?: string;
+  errorMessage?: string;
   labelStyle?: TextStyle;
   inputStyle?: ViewStyle;
   inputProps?: TextInputProps;
@@ -31,6 +35,7 @@ type InputProps = {
 const Input: React.FC<InputProps> = ({
   label,
   labelStyle,
+  errorMessage,
   inputStyle,
   inputProps,
   containerStyle,
@@ -56,6 +61,17 @@ const Input: React.FC<InputProps> = ({
           ...inputStyle,
         }}
       />
+      {errorMessage ? (
+        <View style={{ ...styles.errorContainer }}>
+          <Ionicons
+            name={"close-circle"}
+            size={18}
+            color={gSC("red800")}
+            style={{ marginRight: 2, verticalAlign: "middle" }}
+          />
+          <Text numberOfLines={1} style={{ ...styles.errorText }}>{errorMessage}</Text>
+        </View>
+      ) : null}
     </View>
   );
 };

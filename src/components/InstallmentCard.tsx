@@ -81,6 +81,9 @@ const InstallmentCard: FC<TInstallmentCardProps> = ({ data }) => {
       queryClient.invalidateQueries({
         queryKey: ["installments"],
       });
+      queryClient.resetQueries({
+        queryKey: ["allData"],
+      });
     },
   });
 

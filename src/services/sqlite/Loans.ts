@@ -6,25 +6,6 @@ import { getUtcDateNowString } from "@/utils/date-converter";
 import { TInstallmentDB } from "@/types/Installment";
 
 /**
- * INICIALIZAÇÃO DA TABELA
- * - Executa sempre que app é iniciado. (Somente se outro arquivo chamar esse arquivo)
- */
-db.transaction((tx) => {
-  // tx.executeSql("DROP TABLE loans;");
-  tx.executeSql(
-    `CREATE TABLE IF NOT EXISTS loans (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        customerId INT NOT NULL,
-        total INT NOT NULL,
-        description TEXT NOT NULL,
-        maxInstallments INT NOT NULL,
-        FOREIGN KEY(customerId) REFERENCES customers(id) ON UPDATE CASCADE ON DELETE CASCADE
-      );
-    `
-  );
-});
-
-/**
  * @returns Object created
  */
 async function createOrFail(obj: Omit<TLoanDB, "id">) {

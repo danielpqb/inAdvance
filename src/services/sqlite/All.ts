@@ -2,7 +2,7 @@ import { TAllData, TCustomersObj, TLoansObj } from "@/types/All";
 import db from "./db";
 
 /**
- * @returns Array of objects found
+ * @returns Array of objects found and processed data.
  */
 async function allData() {
   let all = [] as TAllData[];

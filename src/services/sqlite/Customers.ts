@@ -2,17 +2,6 @@ import { TCustomerDB } from "@/types/Customer";
 import db from "./db";
 
 /**
- * INICIALIZAÇÃO DA TABELA
- * - Executa sempre que app é iniciado. (Somente se outro arquivo chamar esse arquivo)
- */
-db.transaction((tx) => {
-  // tx.executeSql("DROP TABLE customers;");
-  tx.executeSql(
-    "CREATE TABLE IF NOT EXISTS customers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE);"
-  );
-});
-
-/**
  * @returns true/false
  */
 async function customerNameExists(name: string) {

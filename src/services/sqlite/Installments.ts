@@ -2,27 +2,6 @@ import { TInstallmentDB } from "@/types/Installment";
 import db from "./db";
 
 /**
- * INICIALIZAÇÃO DA TABELA
- * - Executa sempre que app é iniciado. (Somente se outro arquivo chamar esse arquivo)
- */
-db.transaction((tx) => {
-  // tx.executeSql("DROP TABLE installments;");
-  tx.executeSql(
-    `CREATE TABLE IF NOT EXISTS installments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        number INT NOT NULL,
-        maxInstallments INT NOT NULL,
-        date TEXT NOT NULL,
-        isPaid INT NOT NULL,
-        value INT NOT NULL,
-        loanId INT NOT NULL,
-        FOREIGN KEY(loanId) REFERENCES loans(id) ON UPDATE CASCADE ON DELETE CASCADE
-      );
-    `
-  );
-});
-
-/**
  * @returns Object created
  */
 async function createOrFail(obj: Omit<TInstallmentDB, "id">) {

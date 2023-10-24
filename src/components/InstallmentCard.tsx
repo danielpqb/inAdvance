@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { TInstallment } from "@/types/Installment";
 import Button from "./Button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import installmentDB from "@/services/sqlite/Installments";
+import { useDatabaseContext } from "@/contexts/DatabaseContext";
 
 const styles = StyleSheet.create({
   view: {
@@ -73,10 +73,11 @@ const InstallmentCard: FC<TInstallmentCardProps> = ({ data }) => {
       break;
   }
 
+  const { services } = useDatabaseContext();
   const queryClient = useQueryClient();
   const updateInstallment = useMutation({
     mutationKey: ["updateInstallment"],
-    mutationFn: installmentDB.updateIsPaidOrFail,
+    mutationFn: services.installments.updateIsPaidOrFail,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["installments"],

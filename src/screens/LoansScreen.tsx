@@ -4,8 +4,7 @@ import { gSC, gStyles } from "@/styles/global";
 import { FC } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
-import loanDB from "@/services/sqlite/Loans";
-import allDB from "@/services/sqlite/All";
+import { useDatabaseContext } from "@/contexts/DatabaseContext";
 
 const styles = StyleSheet.create({
   view: {
@@ -28,13 +27,14 @@ const styles = StyleSheet.create({
 
 type TLoansScreenProps = {};
 const LoansScreen: FC<TLoansScreenProps> = () => {
+  const { services } = useDatabaseContext();
   const {
     data: loansData,
     status,
     error,
   } = useQuery({
     queryKey: ["loans"],
-    queryFn: loanDB.findAll,
+    queryFn: services.loans.findAll,
   });
 
   const {
@@ -43,7 +43,7 @@ const LoansScreen: FC<TLoansScreenProps> = () => {
     error: allDataError,
   } = useQuery({
     queryKey: ["allData"],
-    queryFn: allDB.allData,
+    queryFn: services.all.allData,
   });
 
   if (status === "pending" || allDataStatus === "pending") {

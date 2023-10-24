@@ -6,8 +6,8 @@ import { useAppContext } from "@/contexts/AppContext";
 import { monetaryNumberToString } from "@/utils/monetary-value-converter";
 import { router } from "expo-router";
 import { TLoan } from "@/types/Loan";
-import allDB from "@/services/sqlite/All";
 import { useQuery } from "@tanstack/react-query";
+import { useDatabaseContext } from "@/contexts/DatabaseContext";
 
 const styles = StyleSheet.create({
   view: {
@@ -58,13 +58,15 @@ const LoanCard: FC<TLoanCardProps> = ({ data }) => {
   const { changeNavigationMode, setSelectedLoan } = useAppContext();
   const [isSelected, setIsSelected] = useState(false);
 
+  const { services } = useDatabaseContext();
+
   const {
     data: allData,
     status: allDataStatus,
     error,
   } = useQuery({
     queryKey: ["allData"],
-    queryFn: allDB.allData,
+    queryFn: services.all.allData,
   });
 
   if (allDataStatus === "pending") {

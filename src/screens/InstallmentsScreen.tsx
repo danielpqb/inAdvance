@@ -5,9 +5,8 @@ import { useLocalSearchParams } from "expo-router";
 import ScrollContainer from "@/components/ScrollContainer";
 import InstallmentCard from "@/components/InstallmentCard";
 import { useQuery } from "@tanstack/react-query";
-import installmentDB from "@/services/sqlite/Installments";
 import { convertDateStringFormat } from "@/utils/date-converter";
-import Button from "@/components/Button";
+import { useDatabaseContext } from "@/contexts/DatabaseContext";
 
 const styles = StyleSheet.create({
   view: {
@@ -30,13 +29,14 @@ const styles = StyleSheet.create({
 
 type TInstallmentsScreenProps = {};
 const InstallmentsScreen: FC<TInstallmentsScreenProps> = () => {
+  const { services } = useDatabaseContext();
   const {
     data: installmentsData,
     status,
     error,
   } = useQuery({
     queryKey: ["installments"],
-    queryFn: installmentDB.findAll,
+    queryFn: services.installments.findAll,
   });
 
   const { id: loanId } = useLocalSearchParams();

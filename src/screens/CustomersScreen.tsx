@@ -3,9 +3,8 @@ import { FC } from "react";
 import { gSC, gStyles } from "@/styles/global";
 import CustomerCard from "@/components/CustomerCard";
 import ScrollContainer from "@/components/ScrollContainer";
-import customerDB from "@/services/sqlite/Customers";
 import { useQuery } from "@tanstack/react-query";
-import allDB from "@/services/sqlite/All";
+import { useDatabaseContext } from "@/contexts/DatabaseContext";
 
 const styles = StyleSheet.create({
   view: {
@@ -27,13 +26,14 @@ const styles = StyleSheet.create({
 
 type TCustomersScreenProps = {};
 const CustomersScreen: FC<TCustomersScreenProps> = () => {
+  const { services } = useDatabaseContext();
   const {
     data: customersData,
     status,
     error,
   } = useQuery({
     queryKey: ["customers"],
-    queryFn: customerDB.findAll,
+    queryFn: services.customers.findAll,
   });
 
   const {
@@ -42,7 +42,7 @@ const CustomersScreen: FC<TCustomersScreenProps> = () => {
     error: allDataError,
   } = useQuery({
     queryKey: ["allData"],
-    queryFn: allDB.allData,
+    queryFn: services.all.allData,
   });
 
   if (status === "pending" || allDataStatus === "pending") {
@@ -79,6 +79,7 @@ const CustomersScreen: FC<TCustomersScreenProps> = () => {
             );
           })}
         </View>
+        <Text>{}</Text>
       </ScrollContainer>
     );
   }

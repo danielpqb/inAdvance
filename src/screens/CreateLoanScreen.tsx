@@ -9,13 +9,12 @@ import { FC, useState } from "react";
 import { gSC, gStyles } from "@/styles/global";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import loanDB from "@/services/sqlite/Loans";
 import { router } from "expo-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import customerDB from "@/services/sqlite/Customers";
 import { TCustomer } from "@/types/Customer";
 import { ScrollView } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
+import { useDatabaseContext } from "@/contexts/DatabaseContext";
 
 const styles = StyleSheet.create({
   view: {
@@ -57,6 +56,7 @@ const styles = StyleSheet.create({
 
 type TCreateLoanScreenProps = {};
 const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
+  const { services } = useDatabaseContext();
   const [searchedCustomers, setSearchedCustomers] = useState(
     [] as Partial<TCustomer>[]
   );
@@ -74,7 +74,7 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
   });
   const { data: customersData } = useQuery({
     queryKey: ["customers"],
-    queryFn: customerDB.findAll,
+    queryFn: services.customers.findAll,
   });
 
   const [customerNameInputDimensions, setCustomerNameInputDimensions] =
@@ -93,8 +93,7 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
   }) {
     if (customersData) {
       const filtered = [];
-      for (let i = 0; i < customersData.length; i++) {
-        const customer = customersData[i];
+      for (const customer of customersData) {
         const isMatch = customer.name
           .toUpperCase()
           .includes(searchText.toUpperCase());
@@ -108,7 +107,7 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
 
   const createLoan = useMutation({
     mutationKey: ["createLoan"],
-    mutationFn: loanDB.createOrFail,
+    mutationFn: services.loans.createOrFail,
   });
 
   return (
@@ -233,7 +232,7 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
                 await createLoan.mutateAsync({
                   customerId: selectedCustomer.id,
                   description: inputValues.description,
-                  total: Number(inputValues.total),
+                  total: Number(inputValues.total) * 100,
                   maxInstallments: Number(inputValues.maxInstallments),
                 });
                 router.back();

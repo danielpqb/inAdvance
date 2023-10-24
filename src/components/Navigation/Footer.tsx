@@ -61,6 +61,34 @@ const Footer: React.FC<FooterProps> = ({
         <View style={{ ...styles.container, top: styles.container.top + top }}>
           <Button
             onPress={() => {
+              router.push("/dbs");
+            }}
+            style={{
+              ...styles.button,
+            }}
+          >
+            <Ionicons
+              name={"person-circle-outline"}
+              size={35}
+              color={
+                options.title === "DBs"
+                  ? gSC("emerald600")
+                  : gSC("zinc100")
+              }
+            />
+            <Text
+              style={{
+                ...styles.text,
+                ...(options.title === "DBs" && {
+                  color: gSC("emerald600"),
+                }),
+              }}
+            >
+              DBs
+            </Text>
+          </Button>
+          <Button
+            onPress={() => {
               router.push("/customers");
             }}
             style={{

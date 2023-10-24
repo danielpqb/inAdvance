@@ -3,6 +3,7 @@ import AppContext from "@/contexts/AppContext";
 import ThemeContext from "@/contexts/ThemeContext";
 import { ReactNode, FC } from "react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import DatabaseContext from "@/contexts/DatabaseContext";
 
 const queryClient = new QueryClient();
 
@@ -14,7 +15,7 @@ const Contexts: FC<TContextsProps> = ({ children }) => {
     <AppContext>
       <ThemeContext>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <DatabaseContext>{children}</DatabaseContext>
         </QueryClientProvider>
       </ThemeContext>
     </AppContext>

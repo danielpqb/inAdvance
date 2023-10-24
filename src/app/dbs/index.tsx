@@ -1,9 +1,9 @@
+import DatabasesScreen from "@/screens/DatabasesScreen";
 import { FC } from "react";
-import { Redirect } from "expo-router";
 
 type TIndexProps = {};
 const Index: FC<TIndexProps> = () => {
-  return <Redirect href={"/dbs"} />;
+  return <DatabasesScreen />;
 };
 
 export default Index;

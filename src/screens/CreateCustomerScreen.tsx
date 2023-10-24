@@ -3,9 +3,9 @@ import { FC, useState } from "react";
 import { gSC, gStyles } from "@/styles/global";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import customerDB from "@/services/sqlite/Customers";
 import { router } from "expo-router";
 import { useMutation } from "@tanstack/react-query";
+import { useDatabaseContext } from "@/contexts/DatabaseContext";
 
 const styles = StyleSheet.create({
   view: {
@@ -30,8 +30,10 @@ const CreateCustomerScreen: FC<TCreateCustomerScreenProps> = () => {
   const [inputValue, setInputValue] = useState("");
   const [inputErrorMsg, setInputErrorMsg] = useState("");
 
+  const { services } = useDatabaseContext();
+
   const createCustomer = useMutation({
-    mutationFn: customerDB.createOrFail,
+    mutationFn: services.customers.createOrFail,
     mutationKey: ["createCustomer"],
   });
 
@@ -42,7 +44,7 @@ const CreateCustomerScreen: FC<TCreateCustomerScreenProps> = () => {
         errorMessage={inputErrorMsg}
         inputStyle={{ ...styles.input }}
         inputProps={{
-          multiline:false,
+          multiline: false,
           maxLength: 80,
           value: inputValue,
           onChangeText: (text) => {
@@ -58,7 +60,7 @@ const CreateCustomerScreen: FC<TCreateCustomerScreenProps> = () => {
             await createCustomer.mutateAsync({ name: inputValue });
             router.back();
           } catch (error) {
-            setInputErrorMsg(error as string)
+            setInputErrorMsg(error as string);
           }
         }}
       >

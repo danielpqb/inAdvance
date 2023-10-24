@@ -1,8 +1,7 @@
-import { StyleSheet, View, Text } from "react-native";
-import { FC, useEffect, useState } from "react";
-import { gSC, gStyles } from "@/styles/global";
+import { StyleSheet, View } from "react-native";
+import { FC } from "react";
+import { gSC } from "@/styles/global";
 import ScrollContainer from "@/components/ScrollContainer";
-import * as FileSystem from "expo-file-system";
 import Button from "@/components/Button";
 import { useDatabaseContext } from "@/contexts/DatabaseContext";
 import arrayMapping from "@/utils/array-mapping";
@@ -28,15 +27,7 @@ const styles = StyleSheet.create({
 
 type TDatabasesScreenProps = {};
 const DatabasesScreen: FC<TDatabasesScreenProps> = () => {
-  const [dbs, setDbs] = useState([] as string[]);
-  useEffect(() => {
-    const path = `${FileSystem.documentDirectory}/SQLite`;
-    FileSystem.readDirectoryAsync(path).then((v) => {
-      setDbs(v);
-    });
-  }, []);
-
-  const { openDB } = useDatabaseContext();
+  const { openDB, dbs, deleteDB } = useDatabaseContext();
 
   return (
     <ScrollContainer style={{ paddingBottom: 70, paddingTop: 0 }}>
@@ -59,6 +50,36 @@ const DatabasesScreen: FC<TDatabasesScreenProps> = () => {
                       key={idx2}
                       onPress={() => {
                         openDB(db);
+                      }}
+                    >
+                      {db}
+                    </Button>
+                  );
+                })}
+              </View>
+            );
+          })}
+        {arrayMapping
+          .mapToGrid(
+            dbs.filter((db) => !db.includes("journal")),
+            2
+          )
+          .map((row, idx) => {
+            return (
+              <View
+                key={idx}
+                style={{ ...styles.grid }}
+              >
+                {row.map((db, idx2) => {
+                  return (
+                    <Button
+                      style={{
+                        ...styles.button,
+                        backgroundColor: gSC("red800"),
+                      }}
+                      key={idx2}
+                      onPress={() => {
+                        deleteDB(db);
                       }}
                     >
                       {db}

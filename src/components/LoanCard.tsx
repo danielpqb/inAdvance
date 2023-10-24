@@ -2,12 +2,12 @@ import { gSC, gStyles } from "@/styles/global";
 import { FC, useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import Button from "./Button";
-import { useAppContext } from "@/contexts/AppContext";
 import { monetaryNumberToString } from "@/utils/monetary-value-converter";
 import { router } from "expo-router";
 import { TLoan } from "@/types/Loan";
 import { useQuery } from "@tanstack/react-query";
 import { useDatabaseContext } from "@/contexts/DatabaseContext";
+import { useNavigationContext } from "@/contexts/NavigationContext";
 
 const styles = StyleSheet.create({
   view: {
@@ -55,7 +55,7 @@ type TLoanCardProps = {
   data: TLoan;
 };
 const LoanCard: FC<TLoanCardProps> = ({ data }) => {
-  const { changeNavigationMode, setSelectedLoan } = useAppContext();
+  const { changeNavigationMode, setSelectedLoan } = useNavigationContext();
   const [isSelected, setIsSelected] = useState(false);
 
   const { services } = useDatabaseContext();

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "template-daniel",
-    "slug": "template-daniel",
+    "name": "inAdvance",
+    "slug": "inAdvance",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
@@ -12,18 +12,17 @@
       "backgroundColor": "#ffffff"
     },
     "scheme": "myapp",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "icon": "./src/assets/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.danielpqb.templatedaniel"
+      "package": "com.danielpqb.inAdvance"
     },
     "web": {
       "favicon": "./src/assets/favicon.png",
@@ -34,7 +33,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "56172a21-777c-4faf-a240-16c93be178c2"
+        "projectId": "78fcecef-854c-4615-978f-213d4e6beddf"
       }
     },
     "runtimeVersion": {
@@ -43,8 +42,6 @@
     "updates": {
       "url": "https://u.expo.dev/b29354ab-03f7-4c98-bbbe-c30069040c36"
     },
-    "plugins": [
-      "expo-router"
-    ]
+    "plugins": ["expo-router"]
   }
 }

@@ -10,11 +10,12 @@ import { gSC, gStyles } from "@/styles/global";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { router } from "expo-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TCustomer } from "@/types/Customer";
 import { ScrollView } from "react-native-gesture-handler";
 import CurrencyInput from "react-native-currency-input";
 import { useDatabaseContext } from "@/contexts/DatabaseContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const styles = StyleSheet.create({
   view: {
@@ -56,6 +57,8 @@ const styles = StyleSheet.create({
 
 type TCreateLoanScreenProps = {};
 const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
+  const queryCliente = useQueryClient();
+  const { top: safeAreaTop } = useSafeAreaInsets();
   const { services } = useDatabaseContext();
   const [searchedCustomers, setSearchedCustomers] = useState(
     [] as Partial<TCustomer>[]
@@ -269,6 +272,8 @@ const CreateLoanScreen: FC<TCreateLoanScreenProps> = () => {
           style={{
             ...styles.inputSearchContainer,
             top:
+              safeAreaTop +
+              60 +
               customerNameInputDimensions.height +
               customerNameInputDimensions.y,
             width: customerNameInputDimensions.width,

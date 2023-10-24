@@ -1,21 +1,10 @@
 import { View, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  DrawerNavigationOptions,
-  DrawerNavigationProp,
-} from "@react-navigation/drawer";
-import { ParamListBase } from "@react-navigation/routers";
-import {
-  BottomTabNavigationOptions,
-  BottomTabNavigationProp,
-} from "@react-navigation/bottom-tabs";
-import { RouteProp } from "@react-navigation/native";
-import { Layout } from "@react-navigation/elements";
 import { Ionicons } from "@expo/vector-icons";
 import Button from "@/components/Button";
 import { gSC } from "@/styles/global";
 import { router, usePathname } from "expo-router";
-import { useAppContext } from "@/contexts/AppContext";
+import { useNavigationContext } from "@/contexts/NavigationContext";
 
 const styles = StyleSheet.create({
   container: {
@@ -74,22 +63,10 @@ const styles = StyleSheet.create({
   },
 });
 
-type HeaderProps = {
-  navigation:
-    | DrawerNavigationProp<ParamListBase, string, undefined>
-    | BottomTabNavigationProp<ParamListBase, string, undefined>;
-  route: RouteProp<ParamListBase>;
-  layout: Layout;
-  options: DrawerNavigationOptions | BottomTabNavigationOptions;
-};
-const Header: React.FC<HeaderProps> = ({
-  navigation,
-  layout,
-  options,
-  route,
-}) => {
-  const { headerStates, navigationStates, changeNavigationMode } =
-    useAppContext();
+type HeaderProps = {};
+const Header: React.FC<HeaderProps> = () => {
+  const { headerStates, navigationStates, changeNavigationMode, actions } =
+    useNavigationContext();
   const path = usePathname();
   return (
     <>
@@ -130,7 +107,10 @@ const Header: React.FC<HeaderProps> = ({
         ) : null}
         {headerStates?.showDeleteButton ? (
           <Button
-            onPress={() => {}}
+            onPress={() => {
+              actions.deleteFn();
+              changeNavigationMode("default");
+            }}
             style={{ ...styles.deleteButton }}
           >
             <Ionicons
@@ -143,12 +123,16 @@ const Header: React.FC<HeaderProps> = ({
       </View>
       {headerStates.showSubHeader ? (
         <View style={{ ...styles.subHeader }}>
-          <Text style={{ ...styles.subHeaderName }}>
-            {headerStates.subHeaderName}
-          </Text>
-          <Text style={{ ...styles.subHeaderDescription }}>
-            {headerStates.subHeaderDescription}
-          </Text>
+          {headerStates.subHeaderName ? (
+            <Text style={{ ...styles.subHeaderName }}>
+              {headerStates.subHeaderName}
+            </Text>
+          ) : null}
+          {headerStates.subHeaderDescription ? (
+            <Text style={{ ...styles.subHeaderDescription }}>
+              {headerStates.subHeaderDescription}
+            </Text>
+          ) : null}
         </View>
       ) : null}
     </>

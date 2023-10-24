@@ -2,10 +2,10 @@ import { gSC, gStyles } from "@/styles/global";
 import { FC, useEffect, useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import Button from "./Button";
-import { useAppContext } from "@/contexts/AppContext";
 import { monetaryNumberToString } from "@/utils/monetary-value-converter";
 import { router } from "expo-router";
 import { TCustomer } from "@/types/Customer";
+import { useNavigationContext } from "@/contexts/NavigationContext";
 
 const styles = StyleSheet.create({
   view: {
@@ -56,7 +56,7 @@ type TCustomerCardProps = {
   data: TCustomer;
 };
 const CustomerCard: FC<TCustomerCardProps> = ({ data }) => {
-  const { changeNavigationMode, setSelectedCustomer } = useAppContext();
+  const { changeNavigationMode, setSelectedCustomer } = useNavigationContext();
   const [isSelected, setIsSelected] = useState(false);
 
   useEffect(() => {

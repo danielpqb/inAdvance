@@ -49,9 +49,15 @@ function loansService(db: SQLite.SQLiteDatabase) {
     let all: any[] = [];
     await db.transactionAsync(async (tx) => {
       const res = await tx.executeSqlAsync(
-        `SELECT *, customers.name AS customerName
-      FROM loans
-      JOIN customers ON loans.customerId = customers.id;`,
+        `SELECT
+        customers.id AS customerId,
+        customers.name AS customerName,
+        loans.id AS id,
+        loans.description AS description,
+        loans.maxInstallments AS maxInstallments,
+        loans.total AS total
+        FROM loans
+        JOIN customers ON loans.customerId = customers.id;`,
         []
       );
       all = res.rows;

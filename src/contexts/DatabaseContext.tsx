@@ -14,10 +14,11 @@ import {
 import * as SQLite from "expo-sqlite";
 import { useQueryClient } from "@tanstack/react-query";
 import * as FileSystem from "expo-file-system";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type TContext = {
-  openDB: (name: string, resetDB?: boolean) => void;
-  deleteDB: (name: string) => void;
+  openDB: (name: string, resetDB?: boolean) => Promise<void>;
+  deleteDB: (name: string) => Promise<void>;
   services: {
     all: ReturnType<typeof allService>;
     customers: ReturnType<typeof customersService>;
@@ -25,6 +26,7 @@ type TContext = {
     installments: ReturnType<typeof installmentsService>;
   };
   dbs: string[];
+  selectedDB: string;
 };
 const Context = createContext<TContext>({} as TContext);
 
@@ -35,6 +37,7 @@ const DatabaseContext: FC<TProps> = ({ children }) => {
   const rootPath = `${FileSystem.documentDirectory}/SQLite/`;
 
   const queryClient = useQueryClient();
+  const [selectedDB, setSelectedDB] = useState("");
   const [db, setDb] = useState({} as SQLite.SQLiteDatabase);
   const [dbsArray, setDbsArray] = useState([] as string[]);
 
@@ -46,32 +49,54 @@ const DatabaseContext: FC<TProps> = ({ children }) => {
   };
 
   async function openDB(name: string, resetDB?: boolean) {
+    await AsyncStorage.setItem("activeDB", name);
     const newDB = sqliteServices.openDB(name);
     setDb(newDB);
+    setSelectedDB(name);
     await sqliteServices.initDB(newDB, resetDB);
     queryClient.removeQueries();
+    await findDBs();
   }
 
   async function deleteDB(name: string) {
     await FileSystem.deleteAsync(rootPath + name);
     await FileSystem.deleteAsync(rootPath + name + "-journal");
-    await findDBs();
+    const dbs = await findDBs();
+    if (dbs.length > 0) {
+      openDB(dbs[0]);
+    } else {
+      openDB("db");
+    }
   }
 
   async function findDBs() {
-    await FileSystem.readDirectoryAsync(rootPath).then((v) => {
-      setDbsArray(v);
-      console.log(v);
-    });
+    const dbs = await FileSystem.readDirectoryAsync(rootPath);
+    setDbsArray(dbs);
+    return dbs;
   }
 
   useEffect(() => {
-    openDB("appDB");
     findDBs();
+
+    AsyncStorage.getItem("activeDB").then((text) => {
+      if (text) {
+        openDB(text);
+      } else {
+        openDB("db");
+      }
+    });
   }, []);
 
   return (
-    <Context.Provider value={{ openDB, deleteDB, services, dbs: dbsArray }}>
+    <Context.Provider
+      value={{
+        openDB,
+        deleteDB,
+        services,
+        dbs: dbsArray,
+        selectedDB,
+      }}
+    >
       {children}
     </Context.Provider>
   );

@@ -5,6 +5,7 @@ import { FC } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { useDatabaseContext } from "@/contexts/DatabaseContext";
+import { useNavigationContext } from "@/contexts/NavigationContext";
 
 const styles = StyleSheet.create({
   view: {
@@ -21,12 +22,12 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "center",
     verticalAlign: "middle",
-    marginBottom: 60,
   },
 });
 
 type TLoansScreenProps = {};
 const LoansScreen: FC<TLoansScreenProps> = () => {
+  const { selectedCustomer } = useNavigationContext();
   const { services } = useDatabaseContext();
   const {
     data: loansData,
@@ -66,20 +67,27 @@ const LoansScreen: FC<TLoansScreenProps> = () => {
     loansData.length > 0
   ) {
     return (
-      <ScrollContainer style={{ paddingBottom: 70, paddingTop: 0 }}>
+      <ScrollContainer style={{ paddingTop: 0 }}>
         <View style={{ ...styles.view }}>
-          {loansData.map((data, idx) => {
-            return (
-              <LoanCard
-                key={idx}
-                data={{
-                  ...data,
-                  paidInstallments: allData.loans[data.id]?.paid ?? 0,
-                  customerName: data.customerName,
-                }}
-              />
-            );
-          })}
+          {loansData
+            .filter((loan) => {
+              if (selectedCustomer?.id) {
+                return loan.customerId === selectedCustomer.id;
+              }
+              return true;
+            })
+            .map((data, idx) => {
+              return (
+                <LoanCard
+                  key={idx}
+                  data={{
+                    ...data,
+                    paidInstallments: allData.loans[data.id]?.paid ?? 0,
+                    customerName: data.customerName,
+                  }}
+                />
+              );
+            })}
         </View>
       </ScrollContainer>
     );

@@ -1,19 +1,9 @@
-import { View, StyleSheet, Dimensions, Text } from "react-native";
-import {
-  DrawerNavigationOptions,
-  DrawerNavigationProp,
-} from "@react-navigation/drawer";
-import { ParamListBase } from "@react-navigation/routers";
-import { RouteProp } from "@react-navigation/native";
-import { Layout } from "@react-navigation/elements";
+import { View, StyleSheet, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Button from "@/components/Button";
 import { gSC } from "@/styles/global";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { useAppContext } from "@/contexts/AppContext";
-
-const windowHeight = Dimensions.get("window").height;
+import { useNavigationContext } from "@/contexts/NavigationContext";
 
 const styles = StyleSheet.create({
   container: {
@@ -23,8 +13,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
     backgroundColor: gSC("neutral900"),
-    position: "absolute",
-    top: windowHeight - 70,
   },
   text: {
     fontSize: 14,
@@ -40,25 +28,37 @@ const styles = StyleSheet.create({
   },
 });
 
-type FooterProps = {
-  navigation: DrawerNavigationProp<ParamListBase, string, undefined>;
-  route: RouteProp<ParamListBase>;
-  layout: Layout;
-  options: DrawerNavigationOptions;
-};
-const Footer: React.FC<FooterProps> = ({
-  navigation,
-  layout,
-  options,
-  route,
-}) => {
-  const { top } = useSafeAreaInsets();
-  const { footerStates } = useAppContext();
+type FooterProps = {};
+const Footer: React.FC<FooterProps> = () => {
+  const { footerStates, headerStates } = useNavigationContext();
+
+  const iconsStyles = {
+    dbs: {
+      icon:
+        headerStates.title === "Bancos de Dados" ? "layers" : "layers-outline",
+      color:
+        headerStates.title === "Bancos de Dados"
+          ? gSC("emerald600")
+          : gSC("zinc100"),
+    },
+    customers: {
+      icon: headerStates.title === "Clientes" ? "people" : "people-outline",
+      color:
+        headerStates.title === "Clientes" ? gSC("emerald600") : gSC("zinc100"),
+    },
+    loans: {
+      icon: headerStates.title === "Empréstimos" ? "card" : "card-outline",
+      color:
+        headerStates.title === "Empréstimos"
+          ? gSC("emerald600")
+          : gSC("zinc100"),
+    },
+  };
 
   return (
     <>
       {footerStates.showFooter ? (
-        <View style={{ ...styles.container, top: styles.container.top + top }}>
+        <View style={{ ...styles.container }}>
           <Button
             onPress={() => {
               router.push("/dbs");
@@ -68,23 +68,17 @@ const Footer: React.FC<FooterProps> = ({
             }}
           >
             <Ionicons
-              name={"person-circle-outline"}
+              name={iconsStyles.dbs.icon as any}
               size={35}
-              color={
-                options.title === "DBs"
-                  ? gSC("emerald600")
-                  : gSC("zinc100")
-              }
+              color={iconsStyles.dbs.color}
             />
             <Text
               style={{
                 ...styles.text,
-                ...(options.title === "DBs" && {
-                  color: gSC("emerald600"),
-                }),
+                color: iconsStyles.dbs.color,
               }}
             >
-              DBs
+              BDs
             </Text>
           </Button>
           <Button
@@ -96,20 +90,14 @@ const Footer: React.FC<FooterProps> = ({
             }}
           >
             <Ionicons
-              name={"person-circle-outline"}
+              name={iconsStyles.customers.icon as any}
               size={35}
-              color={
-                options.title === "Clientes"
-                  ? gSC("emerald600")
-                  : gSC("zinc100")
-              }
+              color={iconsStyles.customers.color}
             />
             <Text
               style={{
                 ...styles.text,
-                ...(options.title === "Clientes" && {
-                  color: gSC("emerald600"),
-                }),
+                color: iconsStyles.customers.color,
               }}
             >
               Clientes
@@ -122,20 +110,14 @@ const Footer: React.FC<FooterProps> = ({
             style={{ ...styles.button }}
           >
             <Ionicons
-              name={"card-outline"}
+              name={iconsStyles.loans.icon as any}
               size={35}
-              color={
-                options.title === "Empréstimos"
-                  ? gSC("emerald600")
-                  : gSC("zinc100")
-              }
+              color={iconsStyles.loans.color}
             />
             <Text
               style={{
                 ...styles.text,
-                ...(options.title === "Empréstimos" && {
-                  color: gSC("emerald600"),
-                }),
+                color: iconsStyles.loans.color,
               }}
             >
               Empréstimos
